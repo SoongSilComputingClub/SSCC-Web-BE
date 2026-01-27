@@ -91,9 +91,7 @@ jobs:
 #        run: ./gradlew test jacocoTestReport
 
       - name: Run Tests with JaCoCo
-        run: ./gradlew test jacocoTestReport
-        env:
-          SPRING_PROFILES_ACTIVE: test
+        run: ./gradlew test jacocoTestReport --info -Dspring.profiles.active=test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
