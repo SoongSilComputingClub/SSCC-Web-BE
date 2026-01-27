@@ -1,6 +1,7 @@
-package com.example.ssccwebbe.global.apiPayload.exception;
+package com.example.ssccwebbe.global.apipayload.exception;
 
-import com.example.ssccwebbe.global.apiPayload.code.error.ErrorCode;
+import com.example.ssccwebbe.global.apipayload.code.error.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

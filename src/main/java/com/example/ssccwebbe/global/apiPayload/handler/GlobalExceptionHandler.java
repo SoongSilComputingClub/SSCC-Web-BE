@@ -1,11 +1,5 @@
-package com.example.ssccwebbe.global.apiPayload.handler;
+package com.example.ssccwebbe.global.apipayload.handler;
 
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.example.ssccwebbe.global.apiPayload.ApiResponse;
-import com.example.ssccwebbe.global.apiPayload.code.error.CommonErrorCode;
-import com.example.ssccwebbe.global.apiPayload.code.error.ErrorCode;
-import com.example.ssccwebbe.global.apiPayload.exception.GeneralException;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.example.ssccwebbe.global.apipayload.ApiResponse;
+import com.example.ssccwebbe.global.apipayload.code.error.CommonErrorCode;
+import com.example.ssccwebbe.global.apipayload.code.error.ErrorCode;
+import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice(annotations = { RestController.class })
@@ -71,7 +73,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             String value = String.valueOf(ife.getValue());
             String targetType = ife.getTargetType() != null ? ife.getTargetType().getSimpleName() : "Unknown";
 
-            String message = String.format("'%s'는 %s 필드에 유효하지 않은 값입니다. (%s 타입)", value, fieldName, targetType);
+            String message = String.format(
+                    "'%s'는 %s 필드에 유효하지 않은 값입니다. (%s 타입)", value, fieldName, targetType);
             ErrorCode errorCode = CommonErrorCode.INVALID_BODY;
             return handleExceptionInternal(errorCode, message);
         }
@@ -96,14 +99,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> handleExceptionInternal(final ErrorCode errorCode) {
-        return ResponseEntity
-                .status(errorCode.getHttpStatus())
-                .body(ApiResponse.fail(errorCode));
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(ApiResponse.fail(errorCode));
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(final ErrorCode errorCode, final String message) {
-        return ResponseEntity
-                .status(errorCode.getHttpStatus())
+    private ResponseEntity<Object> handleExceptionInternal(
+            final ErrorCode errorCode, final String message) {
+        return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(ApiResponse.fail(errorCode, message));
     }
 }

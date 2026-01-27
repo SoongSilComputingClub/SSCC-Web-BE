@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.global.apiPayload.code.success;
+package com.example.ssccwebbe.global.apipayload.code.success;
 
 import org.springframework.http.HttpStatus;
 

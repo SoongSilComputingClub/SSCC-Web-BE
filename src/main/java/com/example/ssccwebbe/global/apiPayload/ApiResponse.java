@@ -1,15 +1,16 @@
-package com.example.ssccwebbe.global.apiPayload;
+package com.example.ssccwebbe.global.apipayload;
 
+import com.example.ssccwebbe.global.apipayload.code.error.ErrorCode;
+import com.example.ssccwebbe.global.apipayload.code.success.CommonSuccessCode;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.example.ssccwebbe.global.apiPayload.code.error.ErrorCode;
-import com.example.ssccwebbe.global.apiPayload.code.success.CommonSuccessCode;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@JsonPropertyOrder({ "success", "code", "message", "data" })
+@JsonPropertyOrder({"success", "code", "message", "data"})
 public class ApiResponse<T> {
 
     private final boolean success;
@@ -50,18 +51,10 @@ public class ApiResponse<T> {
     }
 
     public static ApiResponse<?> fail(ErrorCode errorCode) {
-        return new ApiResponse<>(
-                false,
-                errorCode.getCode(),
-                errorCode.getMessage(),
-                null);
+        return new ApiResponse<>(false, errorCode.getCode(), errorCode.getMessage(), null);
     }
 
     public static ApiResponse<?> fail(ErrorCode errorCode, String message) {
-        return new ApiResponse<>(
-                false,
-                errorCode.getCode(),
-                message,
-                null);
+        return new ApiResponse<>(false, errorCode.getCode(), message, null);
     }
 }
