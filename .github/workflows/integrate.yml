@@ -84,8 +84,16 @@ jobs:
       - name: Grant execution to Gradle wrapper
         run: chmod +x gradlew
 
+
+## 아래는 리소스에서  프로파일 지정이 없어서 추가했습니다 확인 부탁드립니다
+
+#      - name: Run Tests with JaCoCo
+#        run: ./gradlew test jacocoTestReport
+
       - name: Run Tests with JaCoCo
         run: ./gradlew test jacocoTestReport
+        env:
+          SPRING_PROFILES_ACTIVE: test
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
