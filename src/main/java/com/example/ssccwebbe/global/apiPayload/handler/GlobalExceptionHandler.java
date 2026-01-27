@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@RestControllerAdvice(annotations = { RestController.class })
+@RestControllerAdvice(annotations = {RestController.class})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(GeneralException.class)
@@ -71,10 +71,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (cause instanceof InvalidFormatException ife && !ife.getPath().isEmpty()) {
             String fieldName = ife.getPath().get(0).getFieldName();
             String value = String.valueOf(ife.getValue());
-            String targetType = ife.getTargetType() != null ? ife.getTargetType().getSimpleName() : "Unknown";
+            String targetType =
+                    ife.getTargetType() != null ? ife.getTargetType().getSimpleName() : "Unknown";
 
-            String message = String.format(
-                    "'%s'는 %s 필드에 유효하지 않은 값입니다. (%s 타입)", value, fieldName, targetType);
+            String message =
+                    String.format(
+                            "'%s'는 %s 필드에 유효하지 않은 값입니다. (%s 타입)", value, fieldName, targetType);
             ErrorCode errorCode = CommonErrorCode.INVALID_BODY;
             return handleExceptionInternal(errorCode, message);
         }
