@@ -8,7 +8,7 @@ plugins {
     id 'org.sonarqube' version '7.2.0.6526'
 }
 
-group = 'com.example'
+group = 'com.project'
 version = '0.0.1-SNAPSHOT'
 description = 'Demo project for Spring Boot'
 
@@ -26,7 +26,7 @@ def coverageExcludePackages = [
 def jacocoCoverageExcludes = coverageExcludePackages + ['**/*Application.class']
 
 // Sonar용 제외 패턴 (소스 파일)
-def sonarCoverageExcludes = coverageExcludePackages.collect { it + '/*.java' } + ['**/*Application.java']
+def sonarCoverageExcludes = coverageExcludePackages.collect { it + '/*.java' } + ['**/Application.java']
 
 java {
     toolchain {
@@ -44,17 +44,27 @@ repositories {
     mavenCentral()
 }
 
+// OpenTelemetry BOM for consistent versions
+dependencyManagement {
+    imports {
+        mavenBom 'io.opentelemetry:opentelemetry-bom:1.44.1'
+        mavenBom 'io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.11.0-alpha'
+    }
+}
+
 dependencies {
     // Spring Boot
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    // Monitoring & Observability
+    // Monitoring & Observability - OpenTelemetry (traces, logs)
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+    implementation 'io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0'
+
+    // Micrometer - Prometheus (local scraping) + OTLP (push to Alloy)
     implementation 'io.micrometer:micrometer-registry-prometheus'
-    implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
-    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
+    implementation 'io.micrometer:micrometer-registry-otlp'
 
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'

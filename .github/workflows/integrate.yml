@@ -227,10 +227,10 @@ jobs:
           # Result formatting
           # ------------------------------------------------------------------
           if [ "$QG_STATUS" = "OK" ]; then
-            ICON="PASSED"
+            ICON="✅"
             RESULT="PASSED"
           else
-            ICON="FAILED"
+            ICON="❌"
             RESULT="FAILED"
           fi
 
@@ -239,19 +239,19 @@ jobs:
 
           ${ICON} **Quality Gate ${RESULT}**
 
-          **Branch:** \`${BRANCH}\`
+          **Branch:** \`${BRANCH}\`  
           **Compared to:** default branch
 
           ### Issues
-          - Bugs: ${BUGS}
-          - Vulnerabilities: ${VULNS}
-          - Code Smells: ${SMELLS}
+          - 🐞 Bugs: ${BUGS}
+          - 🔐 Vulnerabilities: ${VULNS}
+          - 📎 Code Smells: ${SMELLS}
 
           ### Measures
           - Coverage: ${COVERAGE}%
           - Duplication: ${DUPLICATION}%
 
-          Dashboard: ${DASHBOARD_URL}&branch=${BRANCH}
+          🔗 Dashboard: ${DASHBOARD_URL}&branch=${BRANCH}
 
           _Generated automatically by GitHub Actions._
           EOF
@@ -281,8 +281,8 @@ jobs:
     needs: [analyze]
 
     permissions:
-      contents: read
       actions: write
+      contents: write
 
     steps:
       - name: Checkout source

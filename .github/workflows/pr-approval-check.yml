@@ -26,7 +26,7 @@ jobs:
             const prAuthor = pr.user.login;
             const headSha = pr.head.sha;
 
-            console.log(`PR #${prNumber} 승인 상태 확인 중...`);
+            console.log(`📋 PR #${prNumber} 승인 상태 확인 중...`);
             console.log(`   작성자: ${prAuthor}`);
             console.log(`   현재 HEAD: ${headSha}`);
 
@@ -67,7 +67,7 @@ jobs:
               console.log(`   승인자: ${approvals.map(r => r.user.login).join(', ')}`);
             }
             if (staleApprovals.length > 0) {
-              console.log(`   만료된 승인 (이전 커밋): ${staleApprovals.map(r => r.user.login).join(', ')}`);
+              console.log(`   ⚠️ 만료된 승인 (이전 커밋): ${staleApprovals.map(r => r.user.login).join(', ')}`);
             }
 
             // Checks API로 체크 상태 직접 업데이트
@@ -79,13 +79,13 @@ jobs:
               status: 'completed',
               conclusion: isApproved ? 'success' : 'failure',
               output: {
-                title: isApproved ? 'Approved' : 'Approval Required',
+                title: isApproved ? '✅ 승인됨' : '❌ 승인 필요',
                 summary: isApproved
                   ? `승인자: ${approvals.map(r => r.user.login).join(', ')}`
                   : staleApprovals.length > 0
-                    ? `최소 1명의 승인이 필요합니다.\n만료된 승인 (새 커밋으로 인해 무효화): ${staleApprovals.map(r => r.user.login).join(', ')}`
+                    ? `최소 1명의 승인이 필요합니다.\n⚠️ 만료된 승인 (새 커밋으로 인해 무효화): ${staleApprovals.map(r => r.user.login).join(', ')}`
                     : '최소 1명의 승인이 필요합니다. (PR 작성자 제외)'
               }
             });
 
-            console.log(isApproved ? 'Approved: 필요한 승인을 받았습니다.' : 'Pending: 승인 대기 중');
+            console.log(isApproved ? '✅ 필요한 승인을 받았습니다.' : '❌ 승인 대기 중');

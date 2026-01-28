@@ -32,14 +32,14 @@ jobs:
             const candidates = reviewers.filter(r => r.toLowerCase() !== prAuthor.toLowerCase());
 
             if (candidates.length === 0) {
-              console.log('할당 가능한 리뷰어가 없습니다.');
+              console.log('⚠️ 할당 가능한 리뷰어가 없습니다.');
               return;
             }
 
             // 랜덤으로 1명 선택
             const selectedReviewer = candidates[Math.floor(Math.random() * candidates.length)];
 
-            console.log(`PR #${prNumber} - 리뷰어 할당: ${selectedReviewer}`);
+            console.log(`📌 PR #${prNumber} - 리뷰어 할당: ${selectedReviewer}`);
 
             try {
               await github.rest.pulls.requestReviewers({
@@ -49,8 +49,8 @@ jobs:
                 reviewers: [selectedReviewer]
               });
 
-              console.log(`리뷰어 할당 완료: ${selectedReviewer}`);
+              console.log(`✅ 리뷰어 할당 완료: ${selectedReviewer}`);
             } catch (error) {
-              console.log(`리뷰어 할당 실패: ${error.message}`);
+              console.log(`❌ 리뷰어 할당 실패: ${error.message}`);
               // 실패해도 워크플로우는 성공으로 처리 (리뷰어가 collaborator가 아닐 수 있음)
             }

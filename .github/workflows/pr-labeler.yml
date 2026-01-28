@@ -28,7 +28,7 @@ jobs:
 
             const totalChanges = pr.additions + pr.deletions;
 
-            console.log(`PR #${prNumber} 변경: +${pr.additions} -${pr.deletions} (총 ${totalChanges} lines)`);
+            console.log(`📊 PR #${prNumber} 변경: +${pr.additions} -${pr.deletions} (총 ${totalChanges} lines)`);
 
             const sizeLabels = {
               'size/XS': { max: 10, color: '3CBF00' },
@@ -57,7 +57,7 @@ jobs:
 
             // 같은 라벨이면 스킵
             if (currentSizeLabel?.name === newSizeLabel) {
-              console.log(`이미 올바른 크기 라벨: ${newSizeLabel}`);
+              console.log(`✅ 이미 올바른 크기 라벨: ${newSizeLabel}`);
               return;
             }
 
@@ -98,7 +98,7 @@ jobs:
               labels: [newSizeLabel]
             });
 
-            console.log(`크기 라벨 적용: ${newSizeLabel}`);
+            console.log(`✅ 크기 라벨 적용: ${newSizeLabel}`);
 
   # ==========================================================================
   # Type Label - PR 커밋들에서 타입 추출 (없을 때만 추가)
@@ -117,18 +117,18 @@ jobs:
 
             // 지원하는 타입 라벨 정의
             const typeLabels = {
-              'feat':     { color: '0E8A16', description: '새로운 기능' },
-              'fix':      { color: 'D93F0B', description: '버그 수정' },
-              'refactor': { color: '1D76DB', description: '리팩토링' },
-              'design':   { color: 'F9D0C4', description: 'UI/디자인 변경' },
-              'style':    { color: 'FEF2C0', description: '코드 스타일 변경' },
-              'docs':     { color: '0075CA', description: '문서 수정' },
-              'test':     { color: 'BFD4F2', description: '테스트 코드' },
-              'chore':    { color: 'D4C5F9', description: '기타 변경사항' },
-              'init':     { color: '5319E7', description: '초기 생성' },
-              'rename':   { color: 'C2E0C6', description: '파일/폴더명 변경' },
-              'remove':   { color: 'B60205', description: '파일 삭제' },
-              'cicd':     { color: 'FBCA04', description: 'CI/CD 관련' }
+              'Feat':     { color: '0E8A16', description: '새로운 기능' },
+              'Fix':      { color: 'D93F0B', description: '버그 수정' },
+              'Refactor': { color: '1D76DB', description: '리팩토링' },
+              'Design':   { color: 'F9D0C4', description: 'UI/디자인 변경' },
+              'Style':    { color: 'FEF2C0', description: '코드 스타일 변경' },
+              'Docs':     { color: '0075CA', description: '문서 수정' },
+              'Test':     { color: 'BFD4F2', description: '테스트 코드' },
+              'Chore':    { color: 'D4C5F9', description: '기타 변경사항' },
+              'Init':     { color: '5319E7', description: '초기 생성' },
+              'Rename':   { color: 'C2E0C6', description: '파일/폴더명 변경' },
+              'Remove':   { color: 'B60205', description: '파일 삭제' },
+              'Cicd':     { color: 'FBCA04', description: 'CI/CD 관련' }
             };
 
             const typeKeys = Object.keys(typeLabels);
@@ -141,7 +141,7 @@ jobs:
               pull_number: prNumber
             });
 
-            console.log(`PR #${prNumber} 커밋 수: ${commits.length}`);
+            console.log(`📝 PR #${prNumber} 커밋 수: ${commits.length}`);
 
             // 각 커밋에서 타입 추출 (중복 제거)
             const detectedTypes = new Set();
@@ -154,10 +154,10 @@ jobs:
               console.log(`   - ${message.substring(0, 60)}${message.length > 60 ? '...' : ''}`);
             }
 
-            console.log(`감지된 타입: ${[...detectedTypes].join(', ') || '없음'}`);
+            console.log(`🔍 감지된 타입: ${[...detectedTypes].join(', ') || '없음'}`);
 
             if (detectedTypes.size === 0) {
-              console.log('커밋에서 타입을 찾을 수 없습니다.');
+              console.log('⚠️ 커밋에서 타입을 찾을 수 없습니다.');
               return;
             }
 
@@ -174,7 +174,7 @@ jobs:
             const labelsToAdd = [...detectedTypes].filter(type => !currentLabelNames.includes(type));
 
             if (labelsToAdd.length === 0) {
-              console.log('모든 타입 라벨이 이미 존재합니다.');
+              console.log('✅ 모든 타입 라벨이 이미 존재합니다.');
               return;
             }
 
@@ -208,4 +208,4 @@ jobs:
               labels: labelsToAdd
             });
 
-            console.log(`타입 라벨 추가: ${labelsToAdd.join(', ')}`);
+            console.log(`✅ 타입 라벨 추가: ${labelsToAdd.join(', ')}`);
