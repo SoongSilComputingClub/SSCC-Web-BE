@@ -19,13 +19,14 @@ def coverageExcludePackages = [
     '**/config/**',      // Config 클래스 제외
     '**/exception/**',   // Exception 클래스 제외
     '**/dto/**',         // DTO 클래스 제외
+    '**/apipayload/**',  // API 공통 응답 및 예외 처리 제외
 ]
 
 // JaCoCo용 제외 패턴 (클래스 파일)
 def jacocoCoverageExcludes = coverageExcludePackages + ['**/*Application.class']
 
 // Sonar용 제외 패턴 (소스 파일)
-def sonarCoverageExcludes = coverageExcludePackages.collect { it + '/*.java' } + ['**/Application.java']
+def sonarCoverageExcludes = coverageExcludePackages.collect { it + '/*.java' } + ['**/*Application.java']
 
 java {
     toolchain {
@@ -58,6 +59,9 @@ dependencies {
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
     runtimeOnly 'com.h2database:h2'
+
+    // Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -165,5 +169,6 @@ sonar {
         property 'sonar.java.coveragePlugin', 'jacoco'
         property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
         property 'sonar.coverage.exclusions', sonarCoverageExcludes.join(',')
+        property 'sonar.exclusions', sonarCoverageExcludes.join(',')
     }
 }
