@@ -169,5 +169,6 @@ sonar {
         property 'sonar.java.coveragePlugin', 'jacoco'
         property 'sonar.coverage.jacoco.xmlReportPaths', 'build/reports/jacoco/test/jacocoTestReport.xml'
         property 'sonar.coverage.exclusions', sonarCoverageExcludes.join(',')
+        property 'sonar.exclusions', sonarCoverageExcludes.join(',')
     }
 }
