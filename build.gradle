@@ -19,7 +19,7 @@ def coverageExcludePackages = [
     '**/config/**',      // Config 클래스 제외
     '**/exception/**',   // Exception 클래스 제외
     '**/dto/**',         // DTO 클래스 제외
-    '**/apiPayload/**',  // API 공통 응답 및 예외 처리 제외
+    '**/apipayload/**',  // API 공통 응답 및 예외 처리 제외
 ]
 
 // JaCoCo용 제외 패턴 (클래스 파일)
