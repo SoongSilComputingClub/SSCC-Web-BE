@@ -115,92 +115,89 @@ jobs:
           script: |
             const prNumber = context.payload.pull_request.number;
 
-            // 지원하는 타입 라벨 정의
             const typeLabels = {
-              'Feat':     { color: '0E8A16', description: '새로운 기능' },
-              'Fix':      { color: 'D93F0B', description: '버그 수정' },
-              'Refactor': { color: '1D76DB', description: '리팩토링' },
-              'Design':   { color: 'F9D0C4', description: 'UI/디자인 변경' },
-              'Style':    { color: 'FEF2C0', description: '코드 스타일 변경' },
-              'Docs':     { color: '0075CA', description: '문서 수정' },
-              'Test':     { color: 'BFD4F2', description: '테스트 코드' },
-              'Chore':    { color: 'D4C5F9', description: '기타 변경사항' },
-              'Init':     { color: '5319E7', description: '초기 생성' },
-              'Rename':   { color: 'C2E0C6', description: '파일/폴더명 변경' },
-              'Remove':   { color: 'B60205', description: '파일 삭제' },
-              'Cicd':     { color: 'FBCA04', description: 'CI/CD 관련' }
+              'feat':     { color: '0E8A16', description: '새로운 기능' },
+              'fix':      { color: 'D93F0B', description: '버그 수정' },
+              'refactor': { color: '1D76DB', description: '리팩토링' },
+              'design':   { color: 'F9D0C4', description: 'UI/디자인 변경' },
+              'style':    { color: 'FEF2C0', description: '코드 스타일 변경' },
+              'docs':     { color: '0075CA', description: '문서 수정' },
+              'test':     { color: 'BFD4F2', description: '테스트 코드' },
+              'chore':    { color: 'D4C5F9', description: '기타 변경사항' },
+              'init':     { color: '5319E7', description: '초기 생성' },
+              'rename':   { color: 'C2E0C6', description: '파일/폴더명 변경' },
+              'remove':   { color: 'B60205', description: '파일 삭제' },
+              'cicd':     { color: 'FBCA04', description: 'CI/CD 관련' }
             };
 
             const typeKeys = Object.keys(typeLabels);
-            const typePattern = new RegExp(`(?:^|\\s)(${typeKeys.join('|')})(?:\\([^)]*\\))?:`, 'i');
 
-            // PR의 커밋 목록 가져오기
+            // 대괄호 형식 + Conventional Commits 모두 지원
+            const typePattern = new RegExp(
+              `(?:^|\\s)(?:\\[?(${typeKeys.join('|')})\\]?)(?::|\\s|\\(|$)`,
+              'i'
+            );
+
             const { data: commits } = await github.rest.pulls.listCommits({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber
             });
 
-            console.log(`📝 PR #${prNumber} 커밋 수: ${commits.length}`);
-
-            // 각 커밋에서 타입 추출 (중복 제거)
             const detectedTypes = new Set();
+
             for (const commit of commits) {
-              const message = commit.commit.message.split('\n')[0]; // 첫 줄만
+              const message = commit.commit.message.split('\n')[0];
               const match = message.match(typePattern);
               if (match) {
                 detectedTypes.add(match[1].toLowerCase());
               }
-              console.log(`   - ${message.substring(0, 60)}${message.length > 60 ? '...' : ''}`);
             }
-
-            console.log(`🔍 감지된 타입: ${[...detectedTypes].join(', ') || '없음'}`);
 
             if (detectedTypes.size === 0) {
               console.log('⚠️ 커밋에서 타입을 찾을 수 없습니다.');
               return;
             }
 
-            // 현재 라벨 확인
             const { data: currentLabels } = await github.rest.issues.listLabelsOnIssue({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: prNumber
             });
 
-            const currentLabelNames = currentLabels.map(l => l.name);
+            const currentLabelNames = currentLabels.map(l => l.name.toLowerCase());
 
-            // 추가할 타입 라벨 필터링 (이미 있는 것 제외)
-            const labelsToAdd = [...detectedTypes].filter(type => !currentLabelNames.includes(type));
+            const labelsToAdd = [...detectedTypes].filter(
+              type => !currentLabelNames.includes(type)
+            );
 
             if (labelsToAdd.length === 0) {
-              console.log('✅ 모든 타입 라벨이 이미 존재합니다.');
+              console.log('✅ 이미 모든 타입 라벨이 존재합니다.');
               return;
             }
 
-            // 라벨이 없으면 생성
+            // 없다면 라벨 생성
             for (const type of labelsToAdd) {
-              const labelConfig = typeLabels[type];
+              if (!typeLabels[type]) continue;
               try {
                 await github.rest.issues.getLabel({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   name: type
                 });
-              } catch (error) {
-                if (error.status === 404) {
+              } catch (e) {
+                if (e.status === 404) {
                   await github.rest.issues.createLabel({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     name: type,
-                    color: labelConfig.color,
-                    description: labelConfig.description
+                    color: typeLabels[type].color,
+                    description: typeLabels[type].description
                   });
                 }
               }
             }
 
-            // 타입 라벨 추가
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
