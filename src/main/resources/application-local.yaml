@@ -1,20 +1,34 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
+    url: ${db-url}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${db-username}
+    password: ${db-password}
 
   jpa:
     hibernate:
       ddl-auto: create-drop
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
 
-  h2:
-    console:
-      enabled: true
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
     org.hibernate.SQL: DEBUG
+
+#OpenTelemetry : off
+otel:
+  sdk:
+    disabled: true
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
