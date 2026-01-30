@@ -1,11 +1,11 @@
 # ============================================================================
-# Backend Deploy Workflow
+# Backend Deploy Workflow (Coolify + GHCR)
 # ============================================================================
 # 역할:
 #   - Integrate workflow 성공 후 자동 실행
 #   - integrate에서 생성된 JAR artifact 사용 (빌드 재수행 없음)
-#   - Docker 이미지 빌드 및 ECR 푸시
-#   - ECS 서비스 배포
+#   - Docker 이미지 빌드 및 GHCR 푸시
+#   - Coolify API로 환경변수 업데이트 및 배포 트리거
 #
 # Job 구조:
 #   prepare ──> build-image ──> deploy
@@ -15,16 +15,17 @@
 #   - 수동 실행 (workflow_dispatch) - 최근 성공한 integrate run의 artifact 사용
 #
 # GitHub Secrets (Settings > Secrets and variables > Actions > Secrets):
-#   - AWS_ACCESS_KEY_ID: AWS IAM Access Key
-#   - AWS_SECRET_ACCESS_KEY: AWS IAM Secret Key
-#
-# GitHub Variables (Settings > Secrets and variables > Actions > Variables):
-#   - ECR_REPOSITORY: ECR 레포지토리 이름
-#   - ECS_CLUSTER: ECS 클러스터 이름
-#   - ECS_SERVICE: ECS 서비스 이름
+#   - COOLIFY_API_TOKEN   : Coolify API Token (Settings > API Tokens에서 생성)
+#   - COOLIFY_URL         : Coolify 서버 URL (e.g., https://coolify.example.com)
+#   - COOLIFY_SERVICE_ID  : Coolify 애플리케이션 서비스 UUID
+#   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
+#   - DATABASE_USER       : DB 사용자명
+#   - DATABASE_PASSWORD   : DB 비밀번호
+#   - JWT_SECRET          : JWT 서명 키
+#   - OTEL_EXPORTER_OTLP_ENDPOINT : OpenTelemetry 수집 엔드포인트 (선택)
 # ============================================================================
 
-name: Deploy Backend to ECS
+name: Deploy Backend to Coolify
 
 on:
   workflow_run:
@@ -36,7 +37,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: ap-northeast-2
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/sscc-web-be
 
 jobs:
   # ==========================================================================
@@ -117,12 +118,16 @@ jobs:
           retention-days: 1
 
   # ==========================================================================
-  # Build Image Job - Docker 빌드 및 ECR 푸시
+  # Build Image Job - Docker 빌드 및 GHCR 푸시
   # ==========================================================================
   build-image:
     name: Build Image
     runs-on: ubuntu-latest
     needs: [prepare]
+
+    permissions:
+      contents: read
+      packages: write
 
     outputs:
       image_tag: ${{ needs.prepare.outputs.head_sha }}
@@ -137,16 +142,8 @@ jobs:
           name: deploy-artifact
           path: build/libs
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -158,13 +155,13 @@ jobs:
           file: Dockerfile.deploy
           push: true
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:${{ needs.prepare.outputs.head_sha }}
-            ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
+            ${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.head_sha }}
+            ${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   # ==========================================================================
-  # Deploy Job - ECS 배포
+  # Deploy Job - Coolify 환경변수 업데이트 및 배포 트리거
   # ==========================================================================
   deploy:
     name: Deploy
@@ -172,34 +169,46 @@ jobs:
     needs: [prepare, build-image]
 
     steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to ECS
+      - name: Update Coolify environment variables
         run: |
-          aws ecs update-service \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --service ${{ vars.ECS_SERVICE }} \
-            --force-new-deployment
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_ID }}/env" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "variables": {
+                "SPRING_PROFILES_ACTIVE": "prod",
+                "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
+                "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
+                "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
+                "JWT_SECRET": "${{ secrets.JWT_SECRET }}",
+                "OTEL_EXPORTER_OTLP_ENDPOINT": "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
+              }
+            }')
 
-      - name: Wait for deployment to stabilize
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            echo "::error::Coolify ENV update failed with HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          echo "Coolify ENV updated successfully (HTTP $HTTP_STATUS)"
+
+      - name: Trigger Coolify deployment
         run: |
-          echo "Waiting for ECS service to stabilize..."
-          aws ecs wait services-stable \
-            --cluster ${{ vars.ECS_CLUSTER }} \
-            --services ${{ vars.ECS_SERVICE }}
-          echo "Deployment completed successfully!"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_ID }}/deploy" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
+
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            echo "::error::Coolify deploy trigger failed with HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          echo "Coolify deployment triggered successfully (HTTP $HTTP_STATUS)"
 
       - name: Deployment Summary
         run: |
           echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image Tag**: ${{ needs.prepare.outputs.head_sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: \`${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.head_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Source Run ID**: ${{ needs.prepare.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **ECS Cluster**: ${{ vars.ECS_CLUSTER }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **ECS Service**: ${{ vars.ECS_SERVICE }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Region**: ${{ env.AWS_REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Registry**: GHCR (ghcr.io)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy Target**: Coolify" >> $GITHUB_STEP_SUMMARY
           echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
