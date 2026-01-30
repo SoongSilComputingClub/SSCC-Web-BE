@@ -1,0 +1,116 @@
+name: Issue Branch Creator
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create_branch:
+    runs-on: ubuntu-latest
+    if: github.event.issue.user.login != 'github-actions[bot]'
+
+    services:
+      libretranslate:
+        image: libretranslate/libretranslate:latest
+        ports:
+          - 5000:5000
+        env:
+          LT_LOAD_ONLY: ko,en
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Wait for LibreTranslate to be ready
+        run: |
+          echo "LibreTranslate 모델 로딩 대기 중..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:5000/languages > /dev/null 2>&1; then
+              echo "LibreTranslate 준비 완료"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "::warning::LibreTranslate 시작 시간 초과 — 번역 없이 진행합니다"
+
+      - name: Parse title and determine prefix
+        id: parse
+        run: |
+          TITLE="${{ github.event.issue.title }}"
+
+          # 이슈 제목에서 [Feat], [Bug] 등 접두사 추출 → 브랜치 prefix 결정
+          TAG=$(echo "$TITLE" | grep -oE '^\[[A-Za-z]+\]' | tr -d '[]' | tr '[:upper:]' '[:lower:]')
+
+          case "$TAG" in
+            feat)     PREFIX="feat" ;;
+            bug|fix)  PREFIX="fix" ;;
+            refactor) PREFIX="refactor" ;;
+            docs)     PREFIX="docs" ;;
+            chore)    PREFIX="chore" ;;
+            test)     PREFIX="test" ;;
+            *)        PREFIX="feat" ;;
+          esac
+
+          # 접두사 태그 제거 (예: [Feat] 지원 기간에 따른... → 지원 기간에 따른...)
+          CLEAN_TITLE=$(echo "$TITLE" | sed 's/\[[^]]*\]//g' | xargs)
+
+          echo "prefix=$PREFIX" >> "$GITHUB_OUTPUT"
+          echo "clean_title=$CLEAN_TITLE" >> "$GITHUB_OUTPUT"
+
+      - name: Translate title to English
+        id: translate
+        run: |
+          CLEAN_TITLE="${{ steps.parse.outputs.clean_title }}"
+
+          # 한글 포함 여부 확인
+          if echo "$CLEAN_TITLE" | grep -qP '[\x{AC00}-\x{D7AF}]'; then
+            echo "한글 감지 — LibreTranslate로 번역 시도"
+
+            TRANSLATED=$(curl -sf -X POST http://localhost:5000/translate \
+              -H "Content-Type: application/json" \
+              -d "{\"q\": \"$CLEAN_TITLE\", \"source\": \"ko\", \"target\": \"en\"}" \
+              | jq -r '.translatedText // empty')
+
+            if [ -n "$TRANSLATED" ]; then
+              echo "번역 결과: $TRANSLATED"
+              echo "text=$TRANSLATED" >> "$GITHUB_OUTPUT"
+            else
+              echo "::warning::번역 실패 — 원본 제목을 사용합니다"
+              echo "text=$CLEAN_TITLE" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "영문 제목 — 번역 불필요"
+            echo "text=$CLEAN_TITLE" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create and push branch
+        run: |
+          PREFIX="${{ steps.parse.outputs.prefix }}"
+          ISSUE_NUMBER="${{ github.event.issue.number }}"
+          TEXT="${{ steps.translate.outputs.text }}"
+
+          # 1. 슬러그 정제: 소문자, 영문/숫자/하이픈만, 공백→하이픈
+          SLUG=$(echo "$TEXT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 -]//g' | sed 's/ /-/g' | sed 's/--*/-/g' | sed 's/^-//' | sed 's/-$//')
+          # 2. 최대 50자로 제한
+          SLUG=$(echo "$SLUG" | cut -c1-50 | sed 's/-$//')
+
+          # 3. 브랜치명 조합
+          if [ -n "$SLUG" ]; then
+            BRANCH_NAME="${PREFIX}/#${ISSUE_NUMBER}-${SLUG}"
+          else
+            BRANCH_NAME="${PREFIX}/#${ISSUE_NUMBER}"
+          fi
+
+          # 4. Git 설정 및 푸시
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH_NAME"
+          git push origin "$BRANCH_NAME"
+
+          # 5. 이슈에 브랜치 정보 코멘트
+          gh issue comment "$ISSUE_NUMBER" --body "🌿 브랜치가 생성되었습니다: \`$BRANCH_NAME\`"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
