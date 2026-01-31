@@ -54,6 +54,12 @@ otel:
     attributes:
       service.name: ${spring.application.name}
 
+# JWT Configuration
+jwt:
+  secret-key: ${JWT_SECRET_KEY:default-secret-key-change-in-production}
+  access-token-expires-in: 3600000  # 1시간 (밀리초)
+  refresh-token-expires-in: 604800000  # 7일 (밀리초)
+
 # Refresh Token Configuration
 refresh-token:
   ttl-days: 8
