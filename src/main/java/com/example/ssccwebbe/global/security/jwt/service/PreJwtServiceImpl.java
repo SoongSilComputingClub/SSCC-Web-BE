@@ -17,7 +17,7 @@ import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Service("preJwtService")
 @RequiredArgsConstructor
 public class PreJwtServiceImpl implements JwtService {
 
