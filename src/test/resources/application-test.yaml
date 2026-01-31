@@ -18,3 +18,5 @@ jwt:
 # Frontend Configuration
 frontend:
   url: http://localhost:5173
+  cookie:
+    secure: false

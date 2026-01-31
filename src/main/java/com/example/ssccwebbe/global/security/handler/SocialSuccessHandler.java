@@ -27,6 +27,9 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${frontend.cookie.secure}")
+    private boolean cookieSecure;
+
     public SocialSuccessHandler(@Qualifier("preJwtService") JwtService preJwtService) {
         // JWT Service 매핑 (Strategy 패턴)
         this.jwtServiceMap =
@@ -62,7 +65,7 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
         // 응답
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false);
+        refreshCookie.setSecure(cookieSecure);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(10); // 10초 (프론트에서 발급 후 바로 헤더 전환 로직 진행 예정)
 

@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,9 @@ import lombok.RequiredArgsConstructor;
 public class PreJwtServiceImpl implements JwtService {
 
     private final PreUserRefreshRepository preUserRefreshRepository;
+
+    @Value("${frontend.cookie.secure}")
+    private boolean cookieSecure;
 
     // 소셜 로그인 성공 후 쿠키로 발급해준 Refresh 토큰을 Refresh 토큰과 Access 토큰을  헤더에 담아 한번에 재발급 해주는 메서드
     @Transactional
@@ -74,7 +78,7 @@ public class PreJwtServiceImpl implements JwtService {
         // 기존 쿠키 제거
         Cookie refreshCookie = new Cookie("refreshToken", null);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false);
+        refreshCookie.setSecure(cookieSecure);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(10);
         response.addCookie(refreshCookie);
