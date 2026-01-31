@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser;
+package com.example.ssccwebbe.domain.preuser.entity;
 
 import com.example.ssccwebbe.global.security.UserRoleType;
 import jakarta.persistence.*;
