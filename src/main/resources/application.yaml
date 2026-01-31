@@ -65,6 +65,12 @@ refresh-token:
   ttl-days: 8
   cleanup-cron: "0 0 3 * * *"  # 매일 3시에 만료된 토큰 정리
 
+# Frontend Configuration
+frontend:
+  url: http://localhost:5173
+  cookie:
+    secure: false
+
 logging:
   level:
     root: INFO

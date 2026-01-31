@@ -20,6 +20,12 @@ jwt:
   access-token-expires-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN:3600000}
   refresh-token-expires-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN:604800000}
 
+# Frontend Configuration
+frontend:
+  url: ${FRONTEND_URL:http://localhost:5173}
+  cookie:
+    secure: true
+
 logging:
   level:
     root: INFO
