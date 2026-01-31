@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 public class SocialSuccessHandler implements AuthenticationSuccessHandler {
 
     private final Map<UserRoleType, JwtService> jwtServiceMap;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     public SocialSuccessHandler(@Qualifier("preJwtService") JwtService preJwtService) {
         // JWT Service 매핑 (Strategy 패턴)
@@ -63,7 +67,7 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
         refreshCookie.setMaxAge(10); // 10초 (프론트에서 발급 후 바로 헤더 전환 로직 진행 예정)
 
         response.addCookie(refreshCookie);
-        response.sendRedirect("http://localhost:5173/cookie"); // 프론트 주소로 redirect
+        response.sendRedirect(frontendUrl + "/cookie"); // 프론트 주소로 redirect
     }
 
     /** "ROLE_PREUSER" -> UserRoleType.PREUSER 변환 */

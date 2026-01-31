@@ -22,6 +22,10 @@ refresh-token:
   ttl-days: 8
   cleanup-cron: "0 0 3 * * *"  # 3AM
 
+# Frontend Configuration
+frontend:
+  url: http://localhost:5173
+
 logging:
   level:
     root: INFO

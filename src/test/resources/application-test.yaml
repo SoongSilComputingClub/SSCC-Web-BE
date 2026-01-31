@@ -14,3 +14,7 @@ jwt:
   secret-key: test-secret-key-for-testing-only
   access-token-expires-in: 3600000  # 1시간 (밀리초)
   refresh-token-expires-in: 604800000  # 7일 (밀리초)
+
+# Frontend Configuration
+frontend:
+  url: http://localhost:5173
