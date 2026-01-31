@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PreUserJwtServiceImpl implements UserJwtService {
+public class PreJwtServiceImpl implements JwtService {
 
     private final PreUserRefreshRepository preUserRefreshRepository;
 

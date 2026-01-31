@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.example.ssccwebbe.global.security.jwt.dto.JwtResponseDto;
 import com.example.ssccwebbe.global.security.jwt.dto.RefreshRequestDto;
 
-public interface UserJwtService {
+public interface JwtService {
 
     /**
      * 소셜 로그인 성공 후 쿠키로 발급해준 Refresh 토큰을 Refresh 토큰과 Access 토큰을 헤더에 담아 한번에 재발급 해주는 메서드
