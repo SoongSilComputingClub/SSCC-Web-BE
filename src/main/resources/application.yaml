@@ -54,6 +54,11 @@ otel:
     attributes:
       service.name: ${spring.application.name}
 
+# Refresh Token Configuration
+refresh-token:
+  ttl-days: 8
+  cleanup-cron: "0 0 3 * * *"  # 매일 3시에 만료된 토큰 정리
+
 logging:
   level:
     root: INFO
