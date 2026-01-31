@@ -11,6 +11,10 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
 
+# Refresh Token Configuration
+refresh-token:
+  ttl-days: 8
+  cleanup-cron: "0 0 3 * * *"  # 3AM
 
 logging:
   level:

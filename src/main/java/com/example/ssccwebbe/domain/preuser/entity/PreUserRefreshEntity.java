@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.global.security.jwt.entity;
+package com.example.ssccwebbe.domain.preuser.entity;
 
 import java.time.LocalDateTime;
 
