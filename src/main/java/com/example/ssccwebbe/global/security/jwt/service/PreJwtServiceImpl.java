@@ -137,11 +137,13 @@ public class PreJwtServiceImpl implements JwtService {
     }
 
     // JWT Refresh 토큰 삭제 메소드
+    @Transactional
     public void removeRefresh(String refreshToken) {
         preUserRefreshRepository.deleteByRefresh(refreshToken);
     }
 
     // 특정 유저 Refresh 토큰 모두 삭제 (탈퇴)
+    @Transactional
     public void removeRefreshUser(String username) {
         preUserRefreshRepository.deleteByUsername(username);
     }
