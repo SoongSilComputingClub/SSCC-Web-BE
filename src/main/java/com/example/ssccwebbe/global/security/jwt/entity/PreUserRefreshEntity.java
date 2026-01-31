@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "pre_user_fresh_entity")
+@Table(name = "pre_user_refresh_entity")
 @Getter
 @Builder
 @NoArgsConstructor
