@@ -21,7 +21,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ github.token }}
 
       - name: Wait for LibreTranslate to be ready
         run: |
@@ -113,4 +113,4 @@ jobs:
           # 5. 이슈에 브랜치 정보 코멘트
           gh issue comment "$ISSUE_NUMBER" --body "🌿 브랜치가 생성되었습니다: \`$BRANCH_NAME\`"
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}

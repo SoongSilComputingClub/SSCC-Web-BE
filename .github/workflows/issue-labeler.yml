@@ -32,4 +32,4 @@ jobs:
 
           gh issue edit "$ISSUE_NUMBER" --add-label "$LABEL"
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
