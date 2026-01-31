@@ -30,6 +30,6 @@ jobs:
             *)        LABEL="feat" ;;
           esac
 
-          gh issue edit "$ISSUE_NUMBER" --add-label "$LABEL"
+          gh issue edit "$ISSUE_NUMBER" --add-label "$LABEL" --repo "${{ github.repository }}"
         env:
           GITHUB_TOKEN: ${{ github.token }}
