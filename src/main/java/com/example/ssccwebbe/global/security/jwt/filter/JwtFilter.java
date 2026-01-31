@@ -16,10 +16,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.ssccwebbe.global.security.jwt.util.JWTUtil;
+import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 
 // JWT 검증 필터
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
     // Request 헤더에서 accessToken 을 추출하여 인증, 인가를 처리함
     @Override
@@ -41,10 +41,10 @@ public class JWTFilter extends OncePerRequestFilter {
         String accessToken = authorization.split(" ")[1];
 
         // 토큰 검증
-        if (JWTUtil.isValid(accessToken, true)) {
+        if (JwtUtil.isValid(accessToken, true)) {
 
-            String username = JWTUtil.getUsername(accessToken);
-            String role = JWTUtil.getRole(accessToken);
+            String username = JwtUtil.getUsername(accessToken);
+            String role = JwtUtil.getRole(accessToken);
 
             List<GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(role));

@@ -16,7 +16,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 
 @Component
-public class JWTUtil {
+public class JwtUtil {
     // static 필드 (실제 사용)
     private static SecretKey secretKey;
     private static Long accessTokenExpiresIn;
@@ -78,10 +78,16 @@ public class JWTUtil {
 
             // JWT 토큰의 페이로드(Claims)에서 "type" 값을 String 타입으로 추출
             String type = claims.get("type", String.class);
-            if (type == null) return false;
+            if (type == null) {
+                return false;
+            }
 
-            if (isAccess && !type.equals("access")) return false;
-            if (!isAccess && !type.equals("refresh")) return false;
+            if (isAccess && !type.equals("access")) {
+                return false;
+            }
+            if (!isAccess && !type.equals("refresh")) {
+                return false;
+            }
 
             return true;
 
@@ -91,7 +97,7 @@ public class JWTUtil {
     }
 
     // JWT(Access/Refresh) 생성
-    public static String createJWT(String username, String role, Boolean isAccess) {
+    public static String createJwt(String username, String role, Boolean isAccess) {
 
         long now = System.currentTimeMillis();
         long expiry = isAccess ? accessTokenExpiresIn : refreshTokenExpiresIn;
