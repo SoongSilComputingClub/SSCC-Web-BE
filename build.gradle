@@ -20,6 +20,7 @@ def coverageExcludePackages = [
     '**/exception/**',   // Exception 클래스 제외
     '**/dto/**',         // DTO 클래스 제외
     '**/apipayload/**',  // API 공통 응답 및 예외 처리 제외
+    '**/security/**', // 시큐리티 관련 클래스 제외
 ]
 
 // JaCoCo용 제외 패턴 (클래스 파일)
@@ -58,6 +59,13 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
     // Monitoring & Observability - OpenTelemetry (traces, logs)
     implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'

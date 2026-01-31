@@ -11,6 +11,12 @@ spring:
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
 
+# JWT Configuration
+jwt:
+  secret-key: ${jwt-secret-key}
+  access-token-expires-in: ${jwt-access-ttl}  # (ms)
+  refresh-token-expires-in: ${jwt-refresh-ttl}  # (ms)
+
 # Refresh Token Configuration
 refresh-token:
   ttl-days: 8

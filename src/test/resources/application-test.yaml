@@ -8,3 +8,9 @@ spring:
     hibernate:
       ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
+
+# JWT Configuration (test environment)
+jwt:
+  secret-key: test-secret-key-for-testing-only
+  access-token-expires-in: 3600000  # 1시간 (밀리초)
+  refresh-token-expires-in: 604800000  # 7일 (밀리초)
