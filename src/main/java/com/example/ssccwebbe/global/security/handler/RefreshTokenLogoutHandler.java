@@ -35,7 +35,9 @@ public class RefreshTokenLogoutHandler implements LogoutHandler {
                             .lines()
                             .reduce("", String::concat);
 
-            if (!StringUtils.hasText(body)) return;
+            if (!StringUtils.hasText(body)) {
+                return;
+            }
 
             ObjectMapper mapper = new ObjectMapper();
             JsonNode jsonNode = mapper.readTree(body);

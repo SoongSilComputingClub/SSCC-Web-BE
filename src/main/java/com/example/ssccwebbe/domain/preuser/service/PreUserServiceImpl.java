@@ -103,8 +103,9 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
 
         authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
-        /* SocialSuccessHandler 에서 authentication.getName()을 호출했을 때 (id가 아닌 ex. 12345) 우리가 원하는 형식 (social_id ex. NAVER_12345) 를 얻기 위해
-           CustomOAuth2User 를 리턴함
+        /*
+            SocialSuccessHandler 에서 authentication.getName()을 호출했을 때
+            (id가 아닌 ex. 12345) 우리가 원하는 형식 (social_id ex. NAVER_12345) 를 얻기 위해 CustomOAuth2User 를 리턴함
         */
         return new CustomOAuth2PreUser(attributes, authorities, username);
     }
