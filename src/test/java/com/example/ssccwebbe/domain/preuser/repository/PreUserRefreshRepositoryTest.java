@@ -165,9 +165,13 @@ class PreUserRefreshRepositoryTest {
     void deleteByRefresh_NonExistingToken_NoError() {
         // given
         String nonExistingToken = "non-existing-token";
+        long initialCount = preUserRefreshRepository.count();
 
-        // when & then - 에러 없이 정상 실행되어야 함
+        // when
         preUserRefreshRepository.deleteByRefresh(nonExistingToken);
+
+        // then - 에러 없이 정상 실행되고 count도 변하지 않음
+        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount);
     }
 
     @Test
@@ -306,9 +310,13 @@ class PreUserRefreshRepositoryTest {
     void deleteByUsername_NonExistingUser_NoError() {
         // given
         String nonExistingUsername = "nonexisting@test.com";
+        long initialCount = preUserRefreshRepository.count();
 
-        // when & then - 에러 없이 정상 실행되어야 함
+        // when
         preUserRefreshRepository.deleteByUsername(nonExistingUsername);
+
+        // then - 에러 없이 정상 실행되고 count도 변하지 않음
+        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount);
     }
 
     @Test
