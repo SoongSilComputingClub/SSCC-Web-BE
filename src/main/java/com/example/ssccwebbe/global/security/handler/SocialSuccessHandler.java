@@ -57,7 +57,7 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
                         roleType, jwtServiceMap.get(UserRoleType.PREUSER)); // 기본값: PREUSER
 
         // JWT(Refresh) 발급 => 소셜 로그인의 경우 브라우저 리다이렉트 방식으로 토큰 발급이 쿠키 방식으로만 가능
-        String refreshToken = JwtUtil.createJwt(username, "ROLE_" + role, false);
+        String refreshToken = JwtUtil.createJwt(username, role, false); // role에 이미 "ROLE_" 접두사 포함
 
         // 발급한 Refresh DB 테이블 저장 (Refresh whitelist)
         jwtService.addRefresh(username, refreshToken);

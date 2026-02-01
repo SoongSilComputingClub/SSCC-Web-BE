@@ -14,6 +14,21 @@ spring:
     console:
       enabled: false
 
+  security:
+    oauth2:
+      client:
+        registration:
+          # Google registration
+          google:
+            client-name: ${goole-client-name}
+            client-id: ${google-client-id}
+            client-secret: ${google-client-secret}
+            redirect-uri: ${google-redirect-uri}
+            authorization-grant-type: authorization_code
+            scope:
+              - profile
+              - email
+
 # JWT Configuration (production uses environment variables)
 jwt:
   secret-key: ${JWT_SECRET_KEY}

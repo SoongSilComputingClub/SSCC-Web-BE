@@ -16,6 +16,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 import lombok.AllArgsConstructor;
@@ -79,4 +80,9 @@ public class PreUserEntity {
     @LastModifiedDate
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    public void updateUser(PreUserRequestDto dto) {
+        this.email = dto.getEmail(); // 이메일 수정 허용
+        this.nickname = dto.getNickname(); // 닉네임 수정 허용
+    }
 }
