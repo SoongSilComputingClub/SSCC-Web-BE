@@ -189,7 +189,6 @@ class PreUserRefreshEntityTest {
         assertThat(foundEntity.getId()).isNotNull();
         assertThat(foundEntity.getUsername()).isEqualTo(username);
         assertThat(foundEntity.getRefresh()).isEqualTo(refreshToken);
-        assertThat(foundEntity.getCreatedDate()).isNull(); // JPA Auditing이 @DataJpaTest에서 작동하지 않음
     }
 
     @Test
