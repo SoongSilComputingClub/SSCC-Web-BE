@@ -5,7 +5,6 @@ import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRefreshRepository;
 import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
     // 소셜 로그인 ( 로그인시 : 신규는 가입 처리, 기존 회원은 회원정보 업데이트)
     // Oauth2 관련 빈이 유저 정보를 받을 경우, 유저 정보를 OAuth2UserRequest 객체를 파라미터로 넘기며 loadUser 를 호출함
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 
         // 부모 메소드 호출(DefaultOAuth2UserService 의 loadUser 호출) => OAuth2User 객체 받아내기
@@ -43,7 +43,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         List<GrantedAuthority> authorities;
 
         String username;
-        String role = UserRoleType.USER.name(); // role은 User를 줌
+        String role;
         String email;
         String nickname;
 
@@ -58,7 +58,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             email = attributes.get("email").toString();
             nickname = attributes.get("name").toString();
 
-            // 네이버도 구글도 아닌 경우
+            // 구글이 아닌 경우
         } else {
             throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다.");
         }
@@ -96,7 +96,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             role = UserRoleType.PREUSER.name(); // 신규 유저의 role 변수 업데이트
         }
 
-        authorities = List.of(new SimpleGrantedAuthority(role));
+        authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
         /* SocialSuccessHandler 에서 authentication.getName()을 호출했을 때 (id가 아닌 ex. 12345) 우리가 원하는 형식 (social_id ex. NAVER_12345) 를 얻기 위해
             CustomOAuth2User 를 리턴함
