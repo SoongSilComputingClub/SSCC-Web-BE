@@ -1,11 +1,12 @@
 package com.example.ssccwebbe.domain.preuser.dto;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+import java.util.Map;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.Collection;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class CustomOAuth2PreUser implements OAuth2User {

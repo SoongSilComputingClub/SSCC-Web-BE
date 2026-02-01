@@ -1,13 +1,9 @@
 package com.example.ssccwebbe.domain.preuser.service;
 
-import com.example.ssccwebbe.domain.preuser.dto.CustomOAuth2PreUser;
-import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
-import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
-import com.example.ssccwebbe.global.security.UserRoleType;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,9 +15,15 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import com.example.ssccwebbe.domain.preuser.dto.CustomOAuth2PreUser;
+import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
+import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
+import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.global.security.UserRoleType;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +50,10 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         String nickname;
 
         // provider 제공자별 데이터 획득 (구글인지)
-        String registrationId = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
+        String registrationId =
+                userRequest.getClientRegistration().getRegistrationId().toUpperCase();
 
-            // 구글 인 경우
+        // 구글 인 경우
         if (registrationId.equals(SocialProviderType.GOOGLE.name())) {
 
             attributes = (Map<String, Object>) oAuth2User.getAttributes();
@@ -64,7 +67,8 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         }
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
-        Optional<PreUserEntity> entity = preUserRepository.findByUsernameAndIsSocial(username,true);
+        Optional<PreUserEntity> entity =
+                preUserRepository.findByUsernameAndIsSocial(username, true);
 
         // 기존 회원인 경우
         if (entity.isPresent()) {
@@ -82,15 +86,16 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             // 신규 회원인 경우
         } else {
             // 신규 유저 추가
-            PreUserEntity newUserEntity = PreUserEntity.builder()
-                    .username(username)
-                    .isLock(false)
-                    .isSocial(true)
-                    .socialProviderType(SocialProviderType.valueOf(registrationId))
-                    .roleType(UserRoleType.PREUSER)
-                    .nickname(nickname)
-                    .email(email)
-                    .build();
+            PreUserEntity newUserEntity =
+                    PreUserEntity.builder()
+                            .username(username)
+                            .isLock(false)
+                            .isSocial(true)
+                            .socialProviderType(SocialProviderType.valueOf(registrationId))
+                            .roleType(UserRoleType.PREUSER)
+                            .nickname(nickname)
+                            .email(email)
+                            .build();
 
             preUserRepository.save(newUserEntity);
             role = UserRoleType.PREUSER.name(); // 신규 유저의 role 변수 업데이트
@@ -99,8 +104,8 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 
         /* SocialSuccessHandler 에서 authentication.getName()을 호출했을 때 (id가 아닌 ex. 12345) 우리가 원하는 형식 (social_id ex. NAVER_12345) 를 얻기 위해
-            CustomOAuth2User 를 리턴함
-         */
+           CustomOAuth2User 를 리턴함
+        */
         return new CustomOAuth2PreUser(attributes, authorities, username);
     }
 
@@ -109,10 +114,15 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
     public PreUserResponseDto readPreUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        PreUserEntity entity = preUserRepository.findByUsernameAndIsLock(username, false)
-                .orElseThrow(() -> new UsernameNotFoundException("해당 유저를 찾을 수 없습니다: " + username));
+        PreUserEntity entity =
+                preUserRepository
+                        .findByUsernameAndIsLock(username, false)
+                        .orElseThrow(
+                                () ->
+                                        new UsernameNotFoundException(
+                                                "해당 유저를 찾을 수 없습니다: " + username));
 
-        return new PreUserResponseDto(username, entity.getIsSocial(), entity.getNickname(), entity.getEmail());
+        return new PreUserResponseDto(
+                username, entity.getIsSocial(), entity.getNickname(), entity.getEmail());
     }
-
 }

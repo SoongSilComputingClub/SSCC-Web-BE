@@ -2,7 +2,6 @@ package com.example.ssccwebbe.domain.preuser.entity;
 
 import java.time.LocalDateTime;
 
-import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -17,6 +16,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 import lombok.AllArgsConstructor;
