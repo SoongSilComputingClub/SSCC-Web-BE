@@ -34,7 +34,7 @@ class SocialProviderTypeTest {
 
     @Test
     @DisplayName("valueOf() 메서드로 GOOGLE을 조회할 수 있다")
-    void valueOf_WithGOOGLE_ReturnsGoogleEnum() {
+    void valueOf_WithGoogle_ReturnsGoogleEnum() {
         // when
         SocialProviderType result = SocialProviderType.valueOf("GOOGLE");
 
