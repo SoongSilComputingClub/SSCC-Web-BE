@@ -2,6 +2,7 @@ package com.example.ssccwebbe.domain.preuser.entity;
 
 import java.time.LocalDateTime;
 
+import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -79,4 +80,9 @@ public class PreUserEntity {
     @LastModifiedDate
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+
+    public void updateUser(PreUserRequestDto dto) {
+        this.email = dto.getEmail(); // 이메일 수정 허용
+        this.nickname = dto.getNickname(); // 닉네임 수정 허용
+    }
 }
