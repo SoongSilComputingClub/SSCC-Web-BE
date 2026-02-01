@@ -2,6 +2,8 @@ package com.example.ssccwebbe.domain.preuser.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -448,5 +450,209 @@ class PreUserRefreshRepositoryTest {
         long afterCount = preUserRefreshRepository.count();
         assertThat(afterCount).isEqualTo(initialCount - 2);
         assertThat(afterCount).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("특정 시간 이전에 생성된 refresh token을 삭제할 수 있다")
+    void deleteByCreatedDateBefore_DeletesOldTokens() throws InterruptedException {
+        // given
+        PreUserRefreshEntity oldRefresh1 =
+                PreUserRefreshEntity.builder()
+                        .username("user1@test.com")
+                        .refresh("old-token-1")
+                        .build();
+
+        PreUserRefreshEntity oldRefresh2 =
+                PreUserRefreshEntity.builder()
+                        .username("user2@test.com")
+                        .refresh("old-token-2")
+                        .build();
+
+        preUserRefreshRepository.save(oldRefresh1);
+        preUserRefreshRepository.save(oldRefresh2);
+        preUserRefreshRepository.flush();
+
+        // 시간 차이를 만들기 위해 약간 대기
+        Thread.sleep(100);
+        LocalDateTime cutoffTime = LocalDateTime.now();
+        Thread.sleep(100);
+
+        PreUserRefreshEntity newRefresh =
+                PreUserRefreshEntity.builder()
+                        .username("user3@test.com")
+                        .refresh("new-token")
+                        .build();
+
+        preUserRefreshRepository.save(newRefresh);
+        preUserRefreshRepository.flush();
+
+        // when
+        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("new-token")).isTrue();
+        assertThat(preUserRefreshRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("모든 토큰보다 이전 시간으로 삭제하면 아무것도 삭제되지 않는다")
+    void deleteByCreatedDateBefore_BeforeAllTokens_DeletesNothing() {
+        // given
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder()
+                        .username("user1@test.com")
+                        .refresh("token-1")
+                        .build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder()
+                        .username("user2@test.com")
+                        .refresh("token-2")
+                        .build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+
+        LocalDateTime veryOldTime = LocalDateTime.now().minusDays(30);
+
+        // when
+        preUserRefreshRepository.deleteByCreatedDateBefore(veryOldTime);
+
+        // then
+        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
+        assertThat(preUserRefreshRepository.existsByRefresh("token-1")).isTrue();
+        assertThat(preUserRefreshRepository.existsByRefresh("token-2")).isTrue();
+    }
+
+    @Test
+    @DisplayName("모든 토큰보다 이후 시간으로 삭제하면 모든 토큰이 삭제된다")
+    void deleteByCreatedDateBefore_AfterAllTokens_DeletesAll() {
+        // given
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder()
+                        .username("user1@test.com")
+                        .refresh("token-1")
+                        .build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder()
+                        .username("user2@test.com")
+                        .refresh("token-2")
+                        .build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.flush();
+
+        LocalDateTime futureTime = LocalDateTime.now().plusDays(1);
+
+        // when
+        preUserRefreshRepository.deleteByCreatedDateBefore(futureTime);
+
+        // then
+        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.existsByRefresh("token-1")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("token-2")).isFalse();
+    }
+
+    @Test
+    @DisplayName("여러 사용자의 토큰 중 오래된 것만 삭제된다")
+    void deleteByCreatedDateBefore_MultipleUsers_DeletesOnlyOldOnes() throws InterruptedException {
+        // given
+        PreUserRefreshEntity oldRefresh1 =
+                PreUserRefreshEntity.builder()
+                        .username("user1@test.com")
+                        .refresh("old-token-1")
+                        .build();
+
+        PreUserRefreshEntity oldRefresh2 =
+                PreUserRefreshEntity.builder()
+                        .username("user1@test.com")
+                        .refresh("old-token-2")
+                        .build();
+
+        preUserRefreshRepository.save(oldRefresh1);
+        preUserRefreshRepository.save(oldRefresh2);
+        preUserRefreshRepository.flush();
+
+        Thread.sleep(100);
+        LocalDateTime cutoffTime = LocalDateTime.now();
+        Thread.sleep(100);
+
+        PreUserRefreshEntity newRefresh1 =
+                PreUserRefreshEntity.builder()
+                        .username("user2@test.com")
+                        .refresh("new-token-1")
+                        .build();
+
+        PreUserRefreshEntity newRefresh2 =
+                PreUserRefreshEntity.builder()
+                        .username("user3@test.com")
+                        .refresh("new-token-2")
+                        .build();
+
+        preUserRefreshRepository.save(newRefresh1);
+        preUserRefreshRepository.save(newRefresh2);
+        preUserRefreshRepository.flush();
+
+        // when
+        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+
+        // then
+        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("new-token-1")).isTrue();
+        assertThat(preUserRefreshRepository.existsByRefresh("new-token-2")).isTrue();
+    }
+
+    @Test
+    @DisplayName("빈 데이터베이스에서 deleteByCreatedDateBefore를 호출해도 에러가 발생하지 않는다")
+    void deleteByCreatedDateBefore_EmptyDatabase_NoError() {
+        // given - setUp()에서 이미 deleteAll() 호출됨
+        LocalDateTime anyTime = LocalDateTime.now();
+
+        // when & then - 에러 없이 정상 실행되어야 함
+        preUserRefreshRepository.deleteByCreatedDateBefore(anyTime);
+        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("같은 사용자의 여러 토큰 중 오래된 것만 삭제된다")
+    void deleteByCreatedDateBefore_SameUserMultipleTokens_DeletesOnlyOldOnes()
+            throws InterruptedException {
+        // given
+        String username = "user@test.com";
+
+        PreUserRefreshEntity oldToken1 =
+                PreUserRefreshEntity.builder().username(username).refresh("old-token-1").build();
+
+        PreUserRefreshEntity oldToken2 =
+                PreUserRefreshEntity.builder().username(username).refresh("old-token-2").build();
+
+        preUserRefreshRepository.save(oldToken1);
+        preUserRefreshRepository.save(oldToken2);
+        preUserRefreshRepository.flush();
+
+        Thread.sleep(100);
+        LocalDateTime cutoffTime = LocalDateTime.now();
+        Thread.sleep(100);
+
+        PreUserRefreshEntity newToken =
+                PreUserRefreshEntity.builder().username(username).refresh("new-token").build();
+
+        preUserRefreshRepository.save(newToken);
+        preUserRefreshRepository.flush();
+
+        // when
+        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+
+        // then
+        assertThat(preUserRefreshRepository.count()).isEqualTo(1);
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("new-token")).isTrue();
     }
 }
