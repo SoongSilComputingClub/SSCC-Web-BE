@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 
+import jakarta.persistence.EntityManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,9 +23,23 @@ class PreUserRefreshRepositoryTest {
 
     @Autowired private PreUserRefreshRepository preUserRefreshRepository;
 
+    @Autowired private EntityManager entityManager;
+
     @BeforeEach
     void setUp() {
         preUserRefreshRepository.deleteAll();
+    }
+
+    private void updateCreatedDate(PreUserRefreshEntity entity, LocalDateTime createdDate) {
+        entityManager
+                .createNativeQuery(
+                        "UPDATE pre_user_refresh_entity SET created_date = :createdDate WHERE id ="
+                                + " :id")
+                .setParameter("createdDate", createdDate)
+                .setParameter("id", entity.getId())
+                .executeUpdate();
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Test
@@ -462,8 +478,12 @@ class PreUserRefreshRepositoryTest {
 
     @Test
     @DisplayName("특정 시간 이전에 생성된 refresh token을 삭제할 수 있다")
-    void deleteByCreatedDateBefore_DeletesOldTokens() throws InterruptedException {
+    void deleteByCreatedDateBefore_DeletesOldTokens() {
         // given
+        LocalDateTime oldTime = LocalDateTime.now().minusHours(2);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime newTime = LocalDateTime.now();
+
         PreUserRefreshEntity oldRefresh1 =
                 PreUserRefreshEntity.builder()
                         .username("user1@test.com")
@@ -480,10 +500,8 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.save(oldRefresh2);
         preUserRefreshRepository.flush();
 
-        // 시간 차이를 만들기 위해 약간 대기
-        Thread.sleep(100);
-        LocalDateTime cutoffTime = LocalDateTime.now();
-        Thread.sleep(100);
+        updateCreatedDate(oldRefresh1, oldTime);
+        updateCreatedDate(oldRefresh2, oldTime);
 
         PreUserRefreshEntity newRefresh =
                 PreUserRefreshEntity.builder()
@@ -493,6 +511,8 @@ class PreUserRefreshRepositoryTest {
 
         preUserRefreshRepository.save(newRefresh);
         preUserRefreshRepository.flush();
+
+        updateCreatedDate(newRefresh, newTime);
 
         // when
         preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
@@ -567,8 +587,12 @@ class PreUserRefreshRepositoryTest {
 
     @Test
     @DisplayName("여러 사용자의 토큰 중 오래된 것만 삭제된다")
-    void deleteByCreatedDateBefore_MultipleUsers_DeletesOnlyOldOnes() throws InterruptedException {
+    void deleteByCreatedDateBefore_MultipleUsers_DeletesOnlyOldOnes() {
         // given
+        LocalDateTime oldTime = LocalDateTime.now().minusHours(2);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime newTime = LocalDateTime.now();
+
         PreUserRefreshEntity oldRefresh1 =
                 PreUserRefreshEntity.builder()
                         .username("user1@test.com")
@@ -585,9 +609,8 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.save(oldRefresh2);
         preUserRefreshRepository.flush();
 
-        Thread.sleep(100);
-        LocalDateTime cutoffTime = LocalDateTime.now();
-        Thread.sleep(100);
+        updateCreatedDate(oldRefresh1, oldTime);
+        updateCreatedDate(oldRefresh2, oldTime);
 
         PreUserRefreshEntity newRefresh1 =
                 PreUserRefreshEntity.builder()
@@ -604,6 +627,9 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.save(newRefresh1);
         preUserRefreshRepository.save(newRefresh2);
         preUserRefreshRepository.flush();
+
+        updateCreatedDate(newRefresh1, newTime);
+        updateCreatedDate(newRefresh2, newTime);
 
         // when
         preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
@@ -629,10 +655,12 @@ class PreUserRefreshRepositoryTest {
 
     @Test
     @DisplayName("같은 사용자의 여러 토큰 중 오래된 것만 삭제된다")
-    void deleteByCreatedDateBefore_SameUserMultipleTokens_DeletesOnlyOldOnes()
-            throws InterruptedException {
+    void deleteByCreatedDateBefore_SameUserMultipleTokens_DeletesOnlyOldOnes() {
         // given
         String username = "user@test.com";
+        LocalDateTime oldTime = LocalDateTime.now().minusHours(2);
+        LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
+        LocalDateTime newTime = LocalDateTime.now();
 
         PreUserRefreshEntity oldToken1 =
                 PreUserRefreshEntity.builder().username(username).refresh("old-token-1").build();
@@ -644,15 +672,16 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.save(oldToken2);
         preUserRefreshRepository.flush();
 
-        Thread.sleep(100);
-        LocalDateTime cutoffTime = LocalDateTime.now();
-        Thread.sleep(100);
+        updateCreatedDate(oldToken1, oldTime);
+        updateCreatedDate(oldToken2, oldTime);
 
         PreUserRefreshEntity newToken =
                 PreUserRefreshEntity.builder().username(username).refresh("new-token").build();
 
         preUserRefreshRepository.save(newToken);
         preUserRefreshRepository.flush();
+
+        updateCreatedDate(newToken, newTime);
 
         // when
         preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
