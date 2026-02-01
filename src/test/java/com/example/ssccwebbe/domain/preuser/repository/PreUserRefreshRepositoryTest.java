@@ -137,4 +137,316 @@ class PreUserRefreshRepositoryTest {
         // then
         assertThat(exists).isTrue();
     }
+
+    @Test
+    @DisplayName("refresh token으로 엔티티를 삭제할 수 있다")
+    void deleteByRefresh_ExistingToken_Success() {
+        // given
+        String refreshToken = "delete-test-token";
+        PreUserRefreshEntity refreshEntity =
+                PreUserRefreshEntity.builder()
+                        .username("user@test.com")
+                        .refresh(refreshToken)
+                        .build();
+        preUserRefreshRepository.save(refreshEntity);
+
+        // when
+        preUserRefreshRepository.deleteByRefresh(refreshToken);
+
+        // then
+        Boolean exists = preUserRefreshRepository.existsByRefresh(refreshToken);
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 refresh token을 삭제해도 에러가 발생하지 않는다")
+    void deleteByRefresh_NonExistingToken_NoError() {
+        // given
+        String nonExistingToken = "non-existing-token";
+
+        // when & then - 에러 없이 정상 실행되어야 함
+        preUserRefreshRepository.deleteByRefresh(nonExistingToken);
+    }
+
+    @Test
+    @DisplayName("여러 엔티티 중 특정 refresh token만 삭제하고 다른 엔티티는 유지된다")
+    void deleteByRefresh_MultipleTokens_DeletesOnlyTarget() {
+        // given
+        String token1 = "token-to-delete";
+        String token2 = "token-to-keep-1";
+        String token3 = "token-to-keep-2";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        // when
+        preUserRefreshRepository.deleteByRefresh(token1);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isTrue();
+        assertThat(preUserRefreshRepository.existsByRefresh(token3)).isTrue();
+    }
+
+    @Test
+    @DisplayName("같은 username의 여러 refresh token 중 하나만 삭제하고 나머지는 유지된다")
+    void deleteByRefresh_SameUserMultipleTokens_DeletesOnlyTarget() {
+        // given
+        String username = "user@test.com";
+        String oldToken = "old-token-to-delete";
+        String newToken = "new-token-to-keep";
+
+        PreUserRefreshEntity oldRefresh =
+                PreUserRefreshEntity.builder().username(username).refresh(oldToken).build();
+
+        PreUserRefreshEntity newRefresh =
+                PreUserRefreshEntity.builder().username(username).refresh(newToken).build();
+
+        preUserRefreshRepository.save(oldRefresh);
+        preUserRefreshRepository.save(newRefresh);
+
+        // when
+        preUserRefreshRepository.deleteByRefresh(oldToken);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh(oldToken)).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh(newToken)).isTrue();
+    }
+
+    @Test
+    @DisplayName("삭제 후 전체 개수가 감소한다")
+    void deleteByRefresh_DecreasesTotalCount() {
+        // given
+        String token1 = "token-1";
+        String token2 = "token-2";
+        String token3 = "token-3";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        long initialCount = preUserRefreshRepository.count();
+
+        // when
+        preUserRefreshRepository.deleteByRefresh(token2);
+
+        // then
+        long afterCount = preUserRefreshRepository.count();
+        assertThat(afterCount).isEqualTo(initialCount - 1);
+    }
+
+    @Test
+    @DisplayName("모든 엔티티를 삭제하면 데이터베이스가 비게 된다")
+    void deleteByRefresh_DeleteAllTokens_EmptyDatabase() {
+        // given
+        String token1 = "token-1";
+        String token2 = "token-2";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+
+        // when
+        preUserRefreshRepository.deleteByRefresh(token1);
+        preUserRefreshRepository.deleteByRefresh(token2);
+
+        // then
+        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isFalse();
+    }
+
+    @Test
+    @DisplayName("username으로 해당 사용자의 모든 refresh token을 삭제할 수 있다")
+    void deleteByUsername_ExistingUser_Success() {
+        // given
+        String username = "user@test.com";
+        String token = "refresh-token";
+        PreUserRefreshEntity refreshEntity =
+                PreUserRefreshEntity.builder().username(username).refresh(token).build();
+        preUserRefreshRepository.save(refreshEntity);
+
+        // when
+        preUserRefreshRepository.deleteByUsername(username);
+
+        // then
+        Boolean exists = preUserRefreshRepository.existsByRefresh(token);
+        assertThat(exists).isFalse();
+        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 username으로 삭제해도 에러가 발생하지 않는다")
+    void deleteByUsername_NonExistingUser_NoError() {
+        // given
+        String nonExistingUsername = "nonexisting@test.com";
+
+        // when & then - 에러 없이 정상 실행되어야 함
+        preUserRefreshRepository.deleteByUsername(nonExistingUsername);
+    }
+
+    @Test
+    @DisplayName("특정 사용자의 token만 삭제하고 다른 사용자의 token은 유지된다")
+    void deleteByUsername_MultipleUsers_DeletesOnlyTargetUser() {
+        // given
+        String userToDelete = "delete@test.com";
+        String userToKeep1 = "keep1@test.com";
+        String userToKeep2 = "keep2@test.com";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder()
+                        .username(userToDelete)
+                        .refresh("token-to-delete")
+                        .build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder()
+                        .username(userToKeep1)
+                        .refresh("token-to-keep-1")
+                        .build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder()
+                        .username(userToKeep2)
+                        .refresh("token-to-keep-2")
+                        .build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        // when
+        preUserRefreshRepository.deleteByUsername(userToDelete);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh("token-to-delete")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("token-to-keep-1")).isTrue();
+        assertThat(preUserRefreshRepository.existsByRefresh("token-to-keep-2")).isTrue();
+        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("같은 username의 여러 refresh token이 모두 삭제된다")
+    void deleteByUsername_MultipleTokensSameUser_DeletesAll() {
+        // given
+        String username = "user@test.com";
+        String token1 = "token-1";
+        String token2 = "token-2";
+        String token3 = "token-3";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder().username(username).refresh(token1).build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder().username(username).refresh(token2).build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder().username(username).refresh(token3).build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        // when
+        preUserRefreshRepository.deleteByUsername(username);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh(token3)).isFalse();
+        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("같은 username의 여러 token을 삭제할 때 다른 사용자는 영향받지 않는다")
+    void deleteByUsername_MultipleTokensSameUser_OtherUsersUnaffected() {
+        // given
+        String userToDelete = "delete@test.com";
+        String otherUser = "other@test.com";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder()
+                        .username(userToDelete)
+                        .refresh("delete-token-1")
+                        .build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder()
+                        .username(userToDelete)
+                        .refresh("delete-token-2")
+                        .build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder().username(otherUser).refresh("keep-token").build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        long initialCount = preUserRefreshRepository.count();
+
+        // when
+        preUserRefreshRepository.deleteByUsername(userToDelete);
+
+        // then
+        assertThat(preUserRefreshRepository.existsByRefresh("delete-token-1")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("delete-token-2")).isFalse();
+        assertThat(preUserRefreshRepository.existsByRefresh("keep-token")).isTrue();
+        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount - 2);
+    }
+
+    @Test
+    @DisplayName("삭제 후 전체 개수가 올바르게 감소한다")
+    void deleteByUsername_DecreasesTotalCount() {
+        // given
+        String user1 = "user1@test.com";
+        String user2 = "user2@test.com";
+
+        PreUserRefreshEntity refresh1 =
+                PreUserRefreshEntity.builder().username(user1).refresh("token-1").build();
+
+        PreUserRefreshEntity refresh2 =
+                PreUserRefreshEntity.builder().username(user1).refresh("token-2").build();
+
+        PreUserRefreshEntity refresh3 =
+                PreUserRefreshEntity.builder().username(user2).refresh("token-3").build();
+
+        preUserRefreshRepository.save(refresh1);
+        preUserRefreshRepository.save(refresh2);
+        preUserRefreshRepository.save(refresh3);
+
+        long initialCount = preUserRefreshRepository.count();
+
+        // when
+        preUserRefreshRepository.deleteByUsername(user1);
+
+        // then
+        long afterCount = preUserRefreshRepository.count();
+        assertThat(afterCount).isEqualTo(initialCount - 2);
+        assertThat(afterCount).isEqualTo(1);
+    }
 }
