@@ -318,7 +318,7 @@ class PreUserRefreshRepositoryTest {
         // then
         Boolean exists = preUserRefreshRepository.existsByRefresh(token);
         assertThat(exists).isFalse();
-        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -332,7 +332,7 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.deleteByUsername(nonExistingUsername);
 
         // then - 에러 없이 정상 실행되고 count도 변하지 않음
-        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount);
+        assertThat(preUserRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -404,7 +404,7 @@ class PreUserRefreshRepositoryTest {
         assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
         assertThat(preUserRefreshRepository.existsByRefresh(token2)).isFalse();
         assertThat(preUserRefreshRepository.existsByRefresh(token3)).isFalse();
-        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -580,7 +580,7 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.deleteByCreatedDateBefore(futureTime);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.count()).isZero();
         assertThat(preUserRefreshRepository.existsByRefresh("token-1")).isFalse();
         assertThat(preUserRefreshRepository.existsByRefresh("token-2")).isFalse();
     }
@@ -650,7 +650,7 @@ class PreUserRefreshRepositoryTest {
 
         // when & then - 에러 없이 정상 실행되어야 함
         preUserRefreshRepository.deleteByCreatedDateBefore(anyTime);
-        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
+        assertThat(preUserRefreshRepository.count()).isZero();
     }
 
     @Test

@@ -122,7 +122,7 @@ class SocialProviderTypeTest {
         int ordinal = SocialProviderType.GOOGLE.ordinal();
 
         // then
-        assertThat(ordinal).isEqualTo(0);
+        assertThat(ordinal).isZero();
     }
 
     @Test
