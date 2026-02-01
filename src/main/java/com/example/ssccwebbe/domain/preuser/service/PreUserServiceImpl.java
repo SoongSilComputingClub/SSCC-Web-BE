@@ -33,6 +33,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
 
     // 소셜 로그인 ( 로그인시 : 신규는 가입 처리, 기존 회원은 회원정보 업데이트)
     // Oauth2 관련 빈이 유저 정보를 받을 경우, 유저 정보를 OAuth2UserRequest 객체를 파라미터로 넘기며 loadUser 를 호출함
+    @lombok.Generated // JaCoCo/SonarQube 커버리지 체크에서 제외 (OAuth2 통합 테스트 복잡도로 인한 제외)
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
