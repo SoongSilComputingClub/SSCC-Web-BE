@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+// 지원서 조회 응답을 위한 DTO
 public record ApplyFormReadResponse(
 	Long applyFormId,
 	String username,

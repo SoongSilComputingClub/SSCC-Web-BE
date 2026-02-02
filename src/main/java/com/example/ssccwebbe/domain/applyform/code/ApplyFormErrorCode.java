@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.applyform.exception;
+package com.example.ssccwebbe.domain.applyform.code;
 
 import org.springframework.http.HttpStatus;
 
