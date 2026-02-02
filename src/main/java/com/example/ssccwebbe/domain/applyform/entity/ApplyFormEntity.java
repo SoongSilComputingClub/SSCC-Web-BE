@@ -2,28 +2,37 @@ package com.example.ssccwebbe.domain.applyform.entity;
 
 import java.time.LocalDateTime;
 
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.example.ssccwebbe.domain.applyform.dto.ApplyFormCreateOrUpdateRequest;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(
-	name = "applyForm",
-	uniqueConstraints = @UniqueConstraint(name = "uk_applyForm_preuser", columnNames = "preuser_id")
+	name = "apply_form_entity",
+	uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id")
 )
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplyFormEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// ERD: preuser_id
+	// PreUser 1명당 지원서 1개
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "preuser_id", nullable = false)
+	@JoinColumn(name = "preuser_id", nullable = false, updatable = false)
 	private PreUserEntity preUser;
 
 	@Column(name = "applicant_name", nullable = false)
@@ -35,7 +44,6 @@ public class ApplyFormEntity {
 	@Column(name = "student_no", nullable = false)
 	private String studentNo;
 
-	// ERD에 grade INTEGER
 	@Column(nullable = false)
 	private Integer grade;
 
@@ -57,51 +65,42 @@ public class ApplyFormEntity {
 	@Column(nullable = false)
 	private String status;
 
-	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	@CreatedDate
+	@Column(name = "created_date", updatable = false)
+	private LocalDateTime createdDate;
 
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
+	@LastModifiedDate
+	@Column(name = "updated_date")
+	private LocalDateTime updatedDate;
 
-	public static ApplyFormEntity create(PreUserEntity preUser) {
-		ApplyFormEntity e = new ApplyFormEntity();
-		ee.preUser = preUser;
-		e.status = "SUBMITTED";
-		return e;
+	public static ApplyFormEntity create(PreUserEntity preUser, ApplyFormCreateOrUpdateRequest req) {
+		return new ApplyFormEntity(
+			null,
+			preUser,
+			req.applicantName(),
+			req.department(),
+			req.studentNo(),
+			req.grade(),
+			req.phone(),
+			req.gender(),
+			req.introduce(),
+			req.codingLevel(),
+			req.techStackText(),
+			"SUBMITTED",
+			null,
+			null
+		);
 	}
 
-	public void update(
-		String applicantName,
-		String department,
-		String studentNo,
-		Integer grade,
-		String phone,
-		String gender,
-		String introduce,
-		String codingLevel,
-		String techStackText
-	) {
-		this.applicantName = applicantName;
-		this.department = department;
-		this.studentNo = studentNo;
-		this.grade = grade;
-		this.phone = phone;
-		this.gender = gender;
-		this.introduce = introduce;
-		this.codingLevel = codingLevel;
-		this.techStackText = techStackText;
-	}
-
-	@PrePersist
-	public void onCreate() {
-		LocalDateTime now = LocalDateTime.now();
-		this.createdAt = now;
-		this.updatedAt = now;
-		if (this.status == null) this.status = "SUBMITTED";
-	}
-
-	@PreUpdate
-	public void onUpdate() {
-		this.updatedAt = LocalDateTime.now();
+	public void update(ApplyFormCreateOrUpdateRequest req) {
+		this.applicantName = req.applicantName();
+		this.department = req.department();
+		this.studentNo = req.studentNo();
+		this.grade = req.grade();
+		this.phone = req.phone();
+		this.gender = req.gender();
+		this.introduce = req.introduce();
+		this.codingLevel = req.codingLevel();
+		this.techStackText = req.techStackText();
 	}
 }
