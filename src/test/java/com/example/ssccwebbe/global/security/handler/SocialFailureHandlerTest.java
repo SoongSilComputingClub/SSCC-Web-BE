@@ -2,6 +2,7 @@ package com.example.ssccwebbe.global.security.handler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
@@ -114,7 +116,7 @@ class SocialFailureHandlerTest {
         socialFailureHandler.onAuthenticationFailure(request, response, exception);
 
         // then
-        // Note: Mockito를 사용하여 verify할 수 있지만, 여기서는 간단히 확인
-        // 실제로는 response.setStatus()와 response.setContentType()이 호출되었는지 확인해야 함
+        verify(response).setStatus(HttpStatus.UNAUTHORIZED.value());
+        verify(response).setContentType("application/json;charset=UTF-8");
     }
 }
