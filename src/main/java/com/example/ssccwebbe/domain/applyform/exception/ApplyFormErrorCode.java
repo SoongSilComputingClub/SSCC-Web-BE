@@ -11,9 +11,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ApplyFormErrorCode implements ErrorCode {
 
-	APPLY_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "APPLYFORM404", "작성된 지원서가 없습니다."),
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "APPLYFORM401", "인증 정보가 없습니다."),
-	INVALID_INTERVIEW_TIMES(HttpStatus.BAD_REQUEST, "APPLYFORM400", "면접 희망 시간이 올바르지 않습니다.");
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "APPLYFORM4041", "해당 유저를 찾을 수 없습니다."),
+	APPLY_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "APPLYFORM4042", "작성된 지원서를 찾을 수 없습니다."),
+	APPLY_FORM_ALREADY_EXISTS(HttpStatus.CONFLICT, "APPLYFORM4091", "이미 지원서를 작성했습니다."),
+	INVALID_INTERVIEW_TIMES(HttpStatus.BAD_REQUEST, "APPLYFORM4001", "면접 희망 시간이 올바르지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;
