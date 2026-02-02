@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,6 +33,7 @@ import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 public class SecurityConfig {
 
     private final AuthenticationSuccessHandler socialSuccessHandler;
+    private final AuthenticationFailureHandler socialFailureHandler;
     private final JwtService jwtService;
 
     @Value("${frontend.url}")
@@ -40,8 +42,10 @@ public class SecurityConfig {
     //  LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
     public SecurityConfig(
             @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
+            @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
             JwtService jwtService) {
         this.socialSuccessHandler = socialSuccessHandler;
+        this.socialFailureHandler = socialFailureHandler;
         this.jwtService = jwtService;
     }
 
@@ -92,7 +96,10 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         // OAuth2 인증용
-        http.oauth2Login(oauth2 -> oauth2.successHandler(socialSuccessHandler));
+        http.oauth2Login(
+                oauth2 ->
+                        oauth2.successHandler(socialSuccessHandler)
+                                .failureHandler(socialFailureHandler));
 
         // 인가
         http.authorizeHttpRequests(
