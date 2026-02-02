@@ -2,8 +2,6 @@ package com.example.ssccwebbe.global.security.config;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -32,6 +33,9 @@ import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 public class SecurityConfig {
 
     private final AuthenticationSuccessHandler socialSuccessHandler;
+    private final AuthenticationFailureHandler socialFailureHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
     private final JwtService jwtService;
 
     @Value("${frontend.url}")
@@ -40,8 +44,14 @@ public class SecurityConfig {
     //  LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
     public SecurityConfig(
             @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
+            @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
+            AuthenticationEntryPoint authenticationEntryPoint,
+            AccessDeniedHandler accessDeniedHandler,
             JwtService jwtService) {
         this.socialSuccessHandler = socialSuccessHandler;
+        this.socialFailureHandler = socialFailureHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
         this.jwtService = jwtService;
     }
 
@@ -92,7 +102,10 @@ public class SecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
 
         // OAuth2 인증용
-        http.oauth2Login(oauth2 -> oauth2.successHandler(socialSuccessHandler));
+        http.oauth2Login(
+                oauth2 ->
+                        oauth2.successHandler(socialSuccessHandler)
+                                .failureHandler(socialFailureHandler));
 
         // 인가
         http.authorizeHttpRequests(
@@ -116,21 +129,8 @@ public class SecurityConfig {
         // 예외 처리
         http.exceptionHandling(
                 e ->
-                        e.authenticationEntryPoint(
-                                        (request, response, authException) -> {
-                                            response.sendError(
-                                                    HttpServletResponse
-                                                            .SC_UNAUTHORIZED); // 401 응답, 로그인이 필요한
-                                            // 경로이나, 로그인을 하지 않은
-                                            // 경우
-                                        })
-                                .accessDeniedHandler(
-                                        (request, response, authException) -> {
-                                            response.sendError(
-                                                    HttpServletResponse
-                                                            .SC_FORBIDDEN); // 403 응답, 로그인을 하였으나 권한이
-                                            // 없는 경우
-                                        }));
+                        e.authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler));
 
         // 커스텀 필터 추가 (로그아웃 필터 앞에 넣음)
         http.addFilterBefore(new JwtFilter(), LogoutFilter.class);

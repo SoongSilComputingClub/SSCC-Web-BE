@@ -16,6 +16,9 @@ import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RefreshTokenLogoutHandler implements LogoutHandler {
 
     private final JwtService jwtService;
@@ -57,7 +60,8 @@ public class RefreshTokenLogoutHandler implements LogoutHandler {
             jwtService.removeRefresh(refreshToken);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read refresh token", e);
+            // 조용히 실패 - logout 자체는 계속 진행
+            log.warn("Failed to read refresh token during logout", e);
         }
     }
 }

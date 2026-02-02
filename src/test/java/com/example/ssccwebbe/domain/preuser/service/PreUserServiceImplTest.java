@@ -16,12 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.example.ssccwebbe.domain.preuser.code.PreUserErrorCode;
 import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @ExtendWith(MockitoExtension.class)
@@ -115,7 +116,7 @@ class PreUserServiceImplTest {
     }
 
     @Test
-    @DisplayName("readPreUser - 존재하지 않는 사용자 조회 시 UsernameNotFoundException 발생")
+    @DisplayName("readPreUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
     void readPreUser_UserNotFound_ThrowsException() {
         // given
         String username = "nonexistent@test.com";
@@ -129,11 +130,11 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.empty());
 
         // when & then
-        org.junit.jupiter.api.Assertions.assertThrows(
-                UsernameNotFoundException.class,
-                () -> preUserService.readPreUser(),
-                "해당 유저를 찾을 수 없습니다: " + username);
+        GeneralException exception =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        GeneralException.class, () -> preUserService.readPreUser());
 
+        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
         verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
@@ -153,9 +154,11 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.empty());
 
         // when & then
-        org.junit.jupiter.api.Assertions.assertThrows(
-                UsernameNotFoundException.class, () -> preUserService.readPreUser());
+        GeneralException exception =
+                org.junit.jupiter.api.Assertions.assertThrows(
+                        GeneralException.class, () -> preUserService.readPreUser());
 
+        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
         verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 

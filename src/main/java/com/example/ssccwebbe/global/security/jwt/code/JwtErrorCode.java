@@ -11,6 +11,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum JwtErrorCode implements ErrorCode {
 
+    // JWT 관련 400 BAD_REQUEST 에러
+    INVALID_TOKEN_FORMAT(HttpStatus.BAD_REQUEST, "JWT4000", "Bearer 토큰 형식이 아닙니다."),
+
     // JWT 관련 401 UNAUTHORIZED 에러
     COOKIE_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT4001", "쿠키가 존재하지 않습니다."),
     REFRESH_TOKEN_COOKIE_NOT_FOUND(HttpStatus.UNAUTHORIZED, "JWT4002", "refreshToken 쿠키가 없습니다."),

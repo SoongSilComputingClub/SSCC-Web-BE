@@ -7,20 +7,22 @@ import java.util.Optional;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.ssccwebbe.domain.preuser.code.PreUserErrorCode;
 import com.example.ssccwebbe.domain.preuser.dto.CustomOAuth2PreUser;
 import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
 import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 import lombok.RequiredArgsConstructor;
@@ -64,7 +66,8 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
 
             // 구글이 아닌 경우
         } else {
-            throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다.");
+            OAuth2Error error = new OAuth2Error("unsupported_provider", "지원하지 않는 소셜 로그인입니다.", null);
+            throw new OAuth2AuthenticationException(error);
         }
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
@@ -119,10 +122,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         PreUserEntity entity =
                 preUserRepository
                         .findByUsernameAndIsLock(username, false)
-                        .orElseThrow(
-                                () ->
-                                        new UsernameNotFoundException(
-                                                "해당 유저를 찾을 수 없습니다: " + username));
+                        .orElseThrow(() -> new GeneralException(PreUserErrorCode.USER_NOT_FOUND));
 
         return new PreUserResponseDto(
                 username, entity.getIsSocial(), entity.getNickname(), entity.getEmail());
