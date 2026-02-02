@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.util.StringUtils;
 
+import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
+import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -57,7 +59,7 @@ public class RefreshTokenLogoutHandler implements LogoutHandler {
             jwtService.removeRefresh(refreshToken);
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read refresh token", e);
+            throw new GeneralException(JwtErrorCode.REFRESH_TOKEN_READ_FAILED);
         }
     }
 }
