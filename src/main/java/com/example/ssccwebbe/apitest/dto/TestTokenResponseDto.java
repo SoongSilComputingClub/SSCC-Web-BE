@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.test.dto;
+package com.example.ssccwebbe.apitest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.test.controller;
+package com.example.ssccwebbe.apitest.controller;
 
 import jakarta.validation.constraints.NotBlank;
 
@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
+import com.example.ssccwebbe.apitest.service.TestService;
 import com.example.ssccwebbe.global.apipayload.ApiResponse;
-import com.example.ssccwebbe.test.dto.TestTokenResponseDto;
-import com.example.ssccwebbe.test.service.TestService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,7 +30,8 @@ public class TestController {
     @Operation(
             summary = "테스트용 토큰 발급",
             description =
-                    "username만으로 유저를 생성하거나 조회하여 access/refresh 토큰을 발급합니다. 이미 존재하는 username이면 새로운 토큰만 발급합니다.")
+                    "username만으로 유저를 생성하거나 조회하여 access/refresh 토큰을 발급합니다. 이미 존재하는 username이면 새로운"
+                            + " 토큰만 발급합니다.")
     public ApiResponse<TestTokenResponseDto> getTestTokens(
             @RequestParam @NotBlank(message = "username은 필수입니다") String username) {
 

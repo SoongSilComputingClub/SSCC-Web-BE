@@ -1,16 +1,16 @@
-package com.example.ssccwebbe.test.service;
+package com.example.ssccwebbe.apitest.service;
 
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
-import com.example.ssccwebbe.test.dto.TestTokenResponseDto;
 
 import lombok.RequiredArgsConstructor;
 
