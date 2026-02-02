@@ -29,12 +29,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         log.warn("Authentication failed: {}", authException.getMessage());
 
         // ApiResponse 형식으로 응답 작성
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setStatus(CommonErrorCode.UNAUTHORIZED.getHttpStatus().value());
         response.setContentType("application/json;charset=UTF-8");
 
         ApiResponse<?> errorResponse =
                 ApiResponse.fail(
-                        CommonErrorCode.BAD_REQUEST,
+                        CommonErrorCode.UNAUTHORIZED,
                         "인증이 필요합니다. 로그인 후 다시 시도해주세요."); // 401 응답, 로그인이 필요한 경로이나 로그인을 하지 않은 경우
         ObjectMapper mapper = new ObjectMapper();
         response.getWriter().write(mapper.writeValueAsString(errorResponse));

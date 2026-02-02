@@ -29,7 +29,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         log.warn("Access denied: {}", accessDeniedException.getMessage());
 
         // ApiResponse 형식으로 응답 작성
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(CommonErrorCode.FORBIDDEN.getHttpStatus().value());
         response.setContentType("application/json;charset=UTF-8");
 
         ApiResponse<?> errorResponse =

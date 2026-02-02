@@ -53,7 +53,7 @@ class CustomAuthenticationEntryPointTest {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
         assertThat(jsonNode.get("success").asBoolean()).isFalse();
-        assertThat(jsonNode.get("code").asText()).isEqualTo(CommonErrorCode.BAD_REQUEST.getCode());
+        assertThat(jsonNode.get("code").asText()).isEqualTo(CommonErrorCode.UNAUTHORIZED.getCode());
         assertThat(jsonNode.get("message").asText()).isEqualTo("인증이 필요합니다. 로그인 후 다시 시도해주세요.");
         assertThat(jsonNode.get("data").isNull()).isTrue();
     }
@@ -72,7 +72,7 @@ class CustomAuthenticationEntryPointTest {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 
         assertThat(jsonNode.get("success").asBoolean()).isFalse();
-        assertThat(jsonNode.get("code").asText()).isEqualTo(CommonErrorCode.BAD_REQUEST.getCode());
+        assertThat(jsonNode.get("code").asText()).isEqualTo(CommonErrorCode.UNAUTHORIZED.getCode());
     }
 
     @Test
