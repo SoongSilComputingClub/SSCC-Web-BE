@@ -15,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//지원서 내 면접 희망시간을 위한 엔티티
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "apply_form_interview_time_entity")

@@ -28,6 +28,7 @@ public class ApplyFormService {
 	private final ApplyFormInterviewTimeRepository interviewTimeRepository;
 	private final PreUserRepository preUserRepository;
 
+	//지원서 조회용
 	@Transactional(readOnly = true)
 	public ApplyFormReadResponse read() {
 		PreUserEntity preUser = currentPreUser();
@@ -37,6 +38,7 @@ public class ApplyFormService {
 		return toResponse(preUser, form);
 	}
 
+	//지원서 처음 생성 시
 	@Transactional
 	public ApplyFormReadResponse create(ApplyFormCreateOrUpdateRequest req) {
 		validate(req);
@@ -52,6 +54,7 @@ public class ApplyFormService {
 		return toResponse(preUser, saved);
 	}
 
+	// 지원서 수정
 	@Transactional
 	public ApplyFormReadResponse update(ApplyFormCreateOrUpdateRequest req) {
 		validate(req);
@@ -68,6 +71,7 @@ public class ApplyFormService {
 
 	// ------------------ private ------------------
 
+	//현재 로그인한 사용자를 pre_user_entity에서 조회
 	private PreUserEntity currentPreUser() {
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -82,6 +86,7 @@ public class ApplyFormService {
 		// 중복 시간 방지까지 하고 싶으면 여기서 Set 체크 추가 가능
 	}
 
+	//면접 희망 시간 덮어쓰기 (기존 삭제 후 새로 저장)
 	private void overwriteInterviewTimes(ApplyFormEntity form, ApplyFormCreateOrUpdateRequest req) {
 		interviewTimeRepository.deleteAllByApplyForm(form);
 

@@ -15,6 +15,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//지원서 엔티
+// 지원상태는 submitted로 시작, 추후 운영진이 합/불에 따라 변경되게
+
+
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
@@ -91,6 +95,8 @@ public class ApplyFormEntity {
 			null
 		);
 	}
+
+	//지원서 수정 용
 
 	public void update(ApplyFormCreateOrUpdateRequest req) {
 		this.applicantName = req.applicantName();
