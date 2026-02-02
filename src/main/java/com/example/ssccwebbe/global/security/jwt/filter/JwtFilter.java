@@ -16,7 +16,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.ssccwebbe.global.apipayload.ApiResponse;
+import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 // JWT 검증 필터
 public class JwtFilter extends OncePerRequestFilter {
@@ -34,7 +37,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (!authorization.startsWith("Bearer ")) {
-            throw new ServletException("Invalid JWT token");
+            // ApiResponse 형식으로 응답 작성
+            response.setStatus(JwtErrorCode.INVALID_TOKEN_FORMAT.getHttpStatus().value());
+            response.setContentType("application/json;charset=UTF-8");
+
+            ApiResponse<?> errorResponse = ApiResponse.fail(JwtErrorCode.INVALID_TOKEN_FORMAT);
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writeValueAsString(errorResponse));
+            return;
         }
 
         // 토큰 파싱
@@ -56,10 +66,13 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            // ApiResponse 형식으로 응답 작성
+            response.setStatus(JwtErrorCode.INVALID_TOKEN.getHttpStatus().value());
             response.setContentType("application/json;charset=UTF-8");
-            response.getWriter().write("{\"error\":\"토큰 만료 또는 유효하지 않은 토큰\"}");
-            return;
+
+            ApiResponse<?> errorResponse = ApiResponse.fail(JwtErrorCode.INVALID_TOKEN);
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writeValueAsString(errorResponse));
         }
     }
 }
