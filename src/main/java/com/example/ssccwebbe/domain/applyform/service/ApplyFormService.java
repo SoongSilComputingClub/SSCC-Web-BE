@@ -35,6 +35,7 @@ public class ApplyFormService {
 		ApplyFormEntity form = applyFormRepository.findByPreUser(preUser)
 			.orElseThrow(() -> new GeneralException(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND));
 
+		requireActive(form);
 		return toResponse(preUser, form);
 	}
 
@@ -44,14 +45,27 @@ public class ApplyFormService {
 		validate(req);
 
 		PreUserEntity preUser = currentPreUser();
-		if (applyFormRepository.existsByPreUser(preUser)) {
-			throw new GeneralException(ApplyFormErrorCode.APPLY_FORM_ALREADY_EXISTS);
-		}
 
-		ApplyFormEntity saved = applyFormRepository.save(ApplyFormEntity.create(preUser, req));
-		overwriteInterviewTimes(saved, req);
+		return applyFormRepository.findByPreUser(preUser)
+			.map(existing -> {
+				// 이미 활성 지원서가 있으면 생성 불가
+				if (!existing.isDeleted()) {
+					throw new GeneralException(ApplyFormErrorCode.APPLY_FORM_ALREADY_EXISTS);
+				}
 
-		return toResponse(preUser, saved);
+				// ✅ soft delete 상태면 복구 + 내용 업데이트 + 면접시간 덮어쓰기 (재작성)
+				existing.restoreSubmitted();
+				existing.update(req);
+				overwriteInterviewTimes(existing, req);
+
+				return toResponse(preUser, existing);
+			})
+			.orElseGet(() -> {
+				// 지원서 자체가 없으면 신규 생성
+				ApplyFormEntity saved = applyFormRepository.save(ApplyFormEntity.create(preUser, req));
+				overwriteInterviewTimes(saved, req);
+				return toResponse(preUser, saved);
+			});
 	}
 
 	// 지원서 수정
@@ -63,10 +77,22 @@ public class ApplyFormService {
 		ApplyFormEntity form = applyFormRepository.findByPreUser(preUser)
 			.orElseThrow(() -> new GeneralException(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND));
 
+		requireActive(form);
+
 		form.update(req);
 		overwriteInterviewTimes(form, req);
 
 		return toResponse(preUser, form);
+	}
+
+	//지원서 삭제
+	@Transactional
+	public void deleteSoft() {
+		PreUserEntity preUser = currentPreUser();
+		ApplyFormEntity form = applyFormRepository.findByPreUser(preUser)
+			.orElseThrow(() -> new GeneralException(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND));
+
+		form.softDelete();
 	}
 
 	// ------------------ private ------------------
@@ -124,5 +150,12 @@ public class ApplyFormService {
 			form.getStatus(),
 			times
 		);
+	}
+
+	// soft 삭제된 지원서는 read/update에서 접근 불가
+	private void requireActive(ApplyFormEntity form) {
+		if (form.isDeleted()) {
+			throw new GeneralException(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND);
+		}
 	}
 }

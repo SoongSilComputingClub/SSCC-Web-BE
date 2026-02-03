@@ -30,6 +30,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplyFormEntity {
 
+	private static final String STATUS_SUBMITTED = "SUBMITTED";
+	private static final String STATUS_DELETED = "DELETED";
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -109,4 +113,22 @@ public class ApplyFormEntity {
 		this.codingLevel = req.codingLevel();
 		this.techStackText = req.techStackText();
 	}
+
+	// 소프트 delete
+	public void softDelete() {
+		this.status = STATUS_DELETED;
+	}
+
+
+	// 소프트 delete된 지원서 복구 (재작성 시)
+	public void restoreSubmitted() {
+		this.status = STATUS_SUBMITTED;
+	}
+
+	// 소프트 delete 여부
+	public boolean isDeleted() {
+		return STATUS_DELETED.equals(this.status);
+	}
+
+
 }

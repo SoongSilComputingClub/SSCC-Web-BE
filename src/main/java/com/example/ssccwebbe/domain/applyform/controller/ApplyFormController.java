@@ -31,4 +31,11 @@ public class ApplyFormController {
 	public ApiResponse<ApplyFormReadResponse> update(@Valid @RequestBody ApplyFormCreateOrUpdateRequest req) {
 		return ApiResponse.success(applyFormService.update(req));
 	}
+
+	//소프트 딜리트
+	@DeleteMapping("/delete_soft")
+	public ApiResponse<Void> deleteSoft() {
+		applyFormService.deleteSoft();
+		return ApiResponse.successWithNoData();
+	}
 }
