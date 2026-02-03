@@ -104,7 +104,7 @@ public class ApplyFormEntity {
                 req.introduce(),
                 req.codingLevel(),
                 req.techStackText(),
-                "SUBMITTED",
+                STATUS_SUBMITTED,
                 null,
                 null);
     }
