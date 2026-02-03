@@ -53,7 +53,7 @@ public class ApplyFormService {
 					throw new GeneralException(ApplyFormErrorCode.APPLY_FORM_ALREADY_EXISTS);
 				}
 
-				// ✅ soft delete 상태면 복구 + 내용 업데이트 + 면접시간 덮어쓰기 (재작성)
+				// soft delete 상태면 복구 + 내용 업데이트 + 면접시간 덮어쓰기 (재작성)
 				existing.restoreSubmitted();
 				existing.update(req);
 				overwriteInterviewTimes(existing, req);
@@ -92,6 +92,10 @@ public class ApplyFormService {
 		ApplyFormEntity form = applyFormRepository.findByPreUser(preUser)
 			.orElseThrow(() -> new GeneralException(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND));
 
+		// 1. 면접 희망 시간 먼저 제거
+		interviewTimeRepository.deleteAllByApplyForm(form);
+
+		// 2. 지원서 상태만 DELETED로 변경
 		form.softDelete();
 	}
 
