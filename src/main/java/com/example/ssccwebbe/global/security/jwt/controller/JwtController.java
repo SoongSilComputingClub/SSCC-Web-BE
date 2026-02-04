@@ -13,6 +13,10 @@ import com.example.ssccwebbe.global.security.jwt.dto.JwtResponseDto;
 import com.example.ssccwebbe.global.security.jwt.dto.RefreshRequestDto;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "JWT 토큰 관리", description = "JWT Access Token과 Refresh Token의 발급 및 재발급을 관리하는 API")
 @RestController
 public class JwtController {
 
@@ -22,13 +26,36 @@ public class JwtController {
         this.jwtService = jwtService;
     }
 
-    // 소셜 로그인의 결과로 쿠키로 받은 Refresh 토큰을 가져오는 경우, Access 토큰과 Refresh 토큰을 헤더에 담아 응답으로 제공함
+    @Operation(
+            summary = "쿠키의 Refresh Token을 헤더로 변환",
+            description =
+                    """
+                    소셜 로그인 후 쿠키로 받은 Refresh Token을 검증하고, 새로운 Access Token과 Refresh Token을 응답 본문으로 반환합니다.
+                    기존 Refresh Token은 삭제되고 새 토큰으로 교체됩니다. (Rotation)
+
+                    **요청:**
+                    - 쿠키: refreshToken (HttpOnly)
+                    - 요청 본문: 빈 JSON ({})
+                    """)
     @PostMapping(value = "/jwt/exchange", consumes = MediaType.APPLICATION_JSON_VALUE)
     public JwtResponseDto jwtExchangeApi(HttpServletRequest request, HttpServletResponse response) {
         return jwtService.cookie2Header(request, response);
     }
 
-    // Refresh 토큰으로 Access 토큰과 Refresh 토큰을 재발급 해줌 (Rotate 포함)
+    @Operation(
+            summary = "Refresh Token으로 토큰 재발급",
+            description =
+                    """
+                    유효한 Refresh Token을 받아 새로운 Access Token과 Refresh Token을 재발급합니다.
+                    기존 Refresh Token은 삭제되고 새 토큰으로 교체됩니다. (Rotation)
+
+                    **요청 본문:**
+                    ```json
+                    {
+                      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    }
+                    ```
+                    """)
     @PostMapping(value = "/jwt/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public JwtResponseDto jwtRefreshApi(@Validated @RequestBody RefreshRequestDto dto) {
         return jwtService.refreshRotate(dto);

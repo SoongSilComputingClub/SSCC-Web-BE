@@ -46,7 +46,32 @@ public class SwaggerConfig {
     }
 
     private Paths createCustomPaths() {
-        return new Paths().addPathItem("/logout", createLogoutPath());
+        return new Paths()
+                .addPathItem("/logout", createLogoutPath())
+                .addPathItem("/oauth2/authorization/google", createGoogleLoginPath());
+    }
+
+    private PathItem createGoogleLoginPath() {
+        return new PathItem()
+                .get(
+                        new Operation()
+                                .summary("구글 소셜 로그인")
+                                .description(
+                                        """
+                                        구글 OAuth2 인증을 시작합니다. 이 URL로 리다이렉트하면 구글 로그인 페이지로 이동합니다.
+                                        로그인 성공 시 Refresh Token이 쿠키로 발급됩니다.
+
+                                        **주의:** 이 엔드포인트는 Swagger UI에서 직접 테스트할 수 없습니다.
+                                        브라우저에서 직접 접근하거나 프론트엔드에서 리다이렉트해야 합니다.
+                                        """)
+                                .addTagsItem("OAuth2 인증")
+                                .responses(
+                                        new ApiResponses()
+                                                .addApiResponse(
+                                                        "302",
+                                                        new ApiResponse()
+                                                                .description(
+                                                                        "구글 로그인 페이지로 리다이렉트"))));
     }
 
     private PathItem createLogoutPath() {
@@ -57,7 +82,7 @@ public class SwaggerConfig {
                                 .description(
                                         "Refresh 토큰을 서버에서 삭제하여 로그아웃 처리합니다. 토큰이 유효하지 않아도 성공 응답을"
                                                 + " 반환합니다.")
-                                .addTagsItem("JWT API")
+                                .addTagsItem("JWT 토큰 관리")
                                 .requestBody(createLogoutRequestBody())
                                 .responses(createLogoutResponses()));
     }
