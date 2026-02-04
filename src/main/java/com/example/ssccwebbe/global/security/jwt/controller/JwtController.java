@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.ssccwebbe.global.apipayload.ApiResponse;
 import com.example.ssccwebbe.global.security.jwt.dto.JwtResponseDto;
 import com.example.ssccwebbe.global.security.jwt.dto.RefreshRequestDto;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
@@ -38,8 +39,9 @@ public class JwtController {
                     - 요청 본문: 빈 JSON ({})
                     """)
     @PostMapping(value = "/jwt/exchange", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public JwtResponseDto jwtExchangeApi(HttpServletRequest request, HttpServletResponse response) {
-        return jwtService.cookie2Header(request, response);
+    public ApiResponse<JwtResponseDto> jwtExchangeApi(
+            HttpServletRequest request, HttpServletResponse response) {
+        return ApiResponse.success(jwtService.cookie2Header(request, response));
     }
 
     @Operation(
@@ -57,7 +59,8 @@ public class JwtController {
                     ```
                     """)
     @PostMapping(value = "/jwt/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public JwtResponseDto jwtRefreshApi(@Validated @RequestBody RefreshRequestDto dto) {
-        return jwtService.refreshRotate(dto);
+    public ApiResponse<JwtResponseDto> jwtRefreshApi(
+            @Validated @RequestBody RefreshRequestDto dto) {
+        return ApiResponse.success(jwtService.refreshRotate(dto));
     }
 }
