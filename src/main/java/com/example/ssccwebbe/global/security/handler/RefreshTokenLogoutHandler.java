@@ -7,10 +7,13 @@ import java.io.InputStreamReader;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.util.StringUtils;
 
+import com.example.ssccwebbe.global.apipayload.ApiResponse;
+import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,9 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 public class RefreshTokenLogoutHandler implements LogoutHandler {
 
     private final JwtService jwtService;
+    private final ObjectMapper objectMapper;
 
     public RefreshTokenLogoutHandler(JwtService jwtService) {
         this.jwtService = jwtService;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -38,21 +43,26 @@ public class RefreshTokenLogoutHandler implements LogoutHandler {
                             .lines()
                             .reduce("", String::concat);
 
+            // refreshToken이 없는 경우
             if (!StringUtils.hasText(body)) {
+                writeErrorResponse(response, JwtErrorCode.REFRESH_TOKEN_REQUIRED);
                 return;
             }
 
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(body);
+            JsonNode jsonNode = objectMapper.readTree(body);
             String refreshToken =
                     jsonNode.has("refreshToken") ? jsonNode.get("refreshToken").asText() : null;
 
-            // 유효성 검증
-            if (refreshToken == null) {
+            // refreshToken이 null이거나 빈 문자열인 경우
+            if (refreshToken == null || refreshToken.isBlank()) {
+                writeErrorResponse(response, JwtErrorCode.REFRESH_TOKEN_REQUIRED);
                 return;
             }
+
+            // refreshToken 유효성 검증
             Boolean isValid = JwtUtil.isValid(refreshToken, false);
             if (!isValid) {
+                writeErrorResponse(response, JwtErrorCode.INVALID_REFRESH_TOKEN);
                 return;
             }
 
@@ -60,8 +70,24 @@ public class RefreshTokenLogoutHandler implements LogoutHandler {
             jwtService.removeRefresh(refreshToken);
 
         } catch (IOException e) {
-            // 조용히 실패 - logout 자체는 계속 진행
-            log.warn("Failed to read refresh token during logout", e);
+            // 요청 본문을 읽을 수 없는 경우
+            log.error("Failed to read request body during logout", e);
+            try {
+                writeErrorResponse(response, JwtErrorCode.REFRESH_TOKEN_REQUIRED);
+            } catch (IOException ioException) {
+                log.error("Failed to write error response", ioException);
+            }
         }
+    }
+
+    private void writeErrorResponse(HttpServletResponse response, JwtErrorCode errorCode)
+            throws IOException {
+        response.setStatus(errorCode.getHttpStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+
+        ApiResponse<?> errorResponse = ApiResponse.fail(errorCode);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        response.flushBuffer(); // 응답 커밋
     }
 }
