@@ -24,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.ssccwebbe.global.security.UserRoleType;
+import com.example.ssccwebbe.global.security.handler.CustomLogoutSuccessHandler;
 import com.example.ssccwebbe.global.security.handler.RefreshTokenLogoutHandler;
 import com.example.ssccwebbe.global.security.jwt.filter.JwtFilter;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
@@ -37,6 +38,7 @@ public class SecurityConfig {
     private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
     private final JwtService jwtService;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -47,12 +49,14 @@ public class SecurityConfig {
             @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
             AuthenticationEntryPoint authenticationEntryPoint,
             AccessDeniedHandler accessDeniedHandler,
-            JwtService jwtService) {
+            JwtService jwtService,
+            CustomLogoutSuccessHandler customLogoutSuccessHandler) {
         this.socialSuccessHandler = socialSuccessHandler;
         this.socialFailureHandler = socialFailureHandler;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
         this.jwtService = jwtService;
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
     }
 
     // 권한 계층
@@ -92,8 +96,11 @@ public class SecurityConfig {
         // CORS 설정 (리액트 기반 서비스이기에 필수적)
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-        // 기본 로그아웃 필터 + 커스텀 Refresh 토큰 삭제 핸들러 추가
-        http.logout(logout -> logout.addLogoutHandler(new RefreshTokenLogoutHandler(jwtService)));
+        // 기본 로그아웃 필터 + 커스텀 Refresh 토큰 삭제 핸들러 추가 + 로그아웃 성공 핸들러
+        http.logout(
+                logout ->
+                        logout.addLogoutHandler(new RefreshTokenLogoutHandler(jwtService))
+                                .logoutSuccessHandler(customLogoutSuccessHandler));
 
         // 기본 Form 기반 인증 필터들 disable => 때문에 LoginFilter.java를 등록하여 사용해야함
         http.formLogin(AbstractHttpConfigurer::disable);

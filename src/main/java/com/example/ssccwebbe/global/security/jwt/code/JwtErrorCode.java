@@ -20,6 +20,7 @@ public enum JwtErrorCode implements ErrorCode {
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "JWT4003", "유효하지 않은 refreshToken입니다."),
     REFRESH_TOKEN_NOT_IN_WHITELIST(
             HttpStatus.UNAUTHORIZED, "JWT4004", "화이트리스트에 없는 refreshToken입니다."),
+    REFRESH_TOKEN_REQUIRED(HttpStatus.BAD_REQUEST, "JWT4005", "로그아웃 요청에 refreshToken이 필요합니다."),
 
     // JWT 관련 403 FORBIDDEN 에러
     EXPIRED_TOKEN(HttpStatus.FORBIDDEN, "JWT4031", "만료된 토큰입니다."),
