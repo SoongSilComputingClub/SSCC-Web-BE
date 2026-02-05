@@ -36,19 +36,13 @@ import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 @ExtendWith(MockitoExtension.class)
 class ApplyFormServiceTest {
 
-    @Mock
-    private ApplyFormRepository applyFormRepository;
-    @Mock
-    private ApplyFormInterviewTimeRepository interviewTimeRepository;
-    @Mock
-    private PreUserRepository preUserRepository;
-    @Mock
-    private SecurityContext securityContext;
-    @Mock
-    private Authentication authentication;
+    @Mock private ApplyFormRepository applyFormRepository;
+    @Mock private ApplyFormInterviewTimeRepository interviewTimeRepository;
+    @Mock private PreUserRepository preUserRepository;
+    @Mock private SecurityContext securityContext;
+    @Mock private Authentication authentication;
 
-    @InjectMocks
-    private ApplyFormService applyFormService;
+    @InjectMocks private ApplyFormService applyFormService;
 
     private String username = "testuser";
     private PreUserEntity preUser;
@@ -56,25 +50,24 @@ class ApplyFormServiceTest {
 
     @BeforeEach
     void setUp() {
-        preUser = PreUserEntity.builder()
-                .username(username)
-                .isLock(false)
-                .build();
+        preUser = PreUserEntity.builder().username(username).isLock(false).build();
 
-        request = new ApplyFormCreateOrUpdateRequest(
-                "홍길동",
-                "컴퓨터학부",
-                "20211234",
-                3,
-                "010-1234-5678",
-                "MALE",
-                "자기소개",
-                "중",
-                "Java, Spring",
-                List.of(new ApplyFormCreateOrUpdateRequest.InterviewTime(
-                        LocalDate.of(2026, 3, 10),
-                        LocalTime.of(10, 0),
-                        LocalTime.of(11, 0))));
+        request =
+                new ApplyFormCreateOrUpdateRequest(
+                        "홍길동",
+                        "컴퓨터학부",
+                        "20211234",
+                        3,
+                        "010-1234-5678",
+                        "MALE",
+                        "자기소개",
+                        "중",
+                        "Java, Spring",
+                        List.of(
+                                new ApplyFormCreateOrUpdateRequest.InterviewTime(
+                                        LocalDate.of(2026, 3, 10),
+                                        LocalTime.of(10, 0),
+                                        LocalTime.of(11, 0))));
 
         lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -86,10 +79,14 @@ class ApplyFormServiceTest {
     void read_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
         when(interviewTimeRepository.findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form))
-                .thenReturn(List.of(ApplyFormInterviewTimeEntity.from(form, request.interviewTimes().get(0))));
+                .thenReturn(
+                        List.of(
+                                ApplyFormInterviewTimeEntity.from(
+                                        form, request.interviewTimes().get(0))));
 
         // when
         ApplyFormReadResponse response = applyFormService.read();
@@ -104,11 +101,13 @@ class ApplyFormServiceTest {
     @DisplayName("read - 지원서 없음 예외 발생")
     void read_NotFound() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.empty());
 
         // when & then
-        GeneralException exception = assertThrows(GeneralException.class, () -> applyFormService.read());
+        GeneralException exception =
+                assertThrows(GeneralException.class, () -> applyFormService.read());
         assertThat(exception.getErrorCode()).isEqualTo(ApplyFormErrorCode.APPLY_FORM_NOT_FOUND);
     }
 
@@ -116,7 +115,8 @@ class ApplyFormServiceTest {
     @DisplayName("create - 신규 지원서 작성 성공")
     void create_Success() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.empty());
 
         ApplyFormEntity savedForm = ApplyFormEntity.create(preUser, request);
@@ -136,12 +136,15 @@ class ApplyFormServiceTest {
     void create_AlreadyExists() {
         // given
         ApplyFormEntity existingForm = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(existingForm));
 
         // when & then
-        GeneralException exception = assertThrows(GeneralException.class, () -> applyFormService.create(request));
-        assertThat(exception.getErrorCode()).isEqualTo(ApplyFormErrorCode.APPLY_FORM_ALREADY_EXISTS);
+        GeneralException exception =
+                assertThrows(GeneralException.class, () -> applyFormService.create(request));
+        assertThat(exception.getErrorCode())
+                .isEqualTo(ApplyFormErrorCode.APPLY_FORM_ALREADY_EXISTS);
     }
 
     @Test
@@ -151,7 +154,8 @@ class ApplyFormServiceTest {
         ApplyFormEntity deletedForm = ApplyFormEntity.create(preUser, request);
         deletedForm.softDelete();
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(deletedForm));
 
         // when
@@ -168,12 +172,22 @@ class ApplyFormServiceTest {
     void update_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
 
-        ApplyFormCreateOrUpdateRequest updateReq = new ApplyFormCreateOrUpdateRequest(
-                "수정된이름", "SW", "20211234", 3, "010-0000-0000", "FEMALE", "수정소개", "상", "stack",
-                request.interviewTimes());
+        ApplyFormCreateOrUpdateRequest updateReq =
+                new ApplyFormCreateOrUpdateRequest(
+                        "수정된이름",
+                        "SW",
+                        "20211234",
+                        3,
+                        "010-0000-0000",
+                        "FEMALE",
+                        "수정소개",
+                        "상",
+                        "stack",
+                        request.interviewTimes());
 
         // when
         ApplyFormReadResponse response = applyFormService.update(updateReq);
@@ -188,7 +202,8 @@ class ApplyFormServiceTest {
     void deleteSoft_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(preUser));
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
 
         // when
@@ -203,10 +218,12 @@ class ApplyFormServiceTest {
     @DisplayName("validate - 면접 시간 미선택 시 예외 발생")
     void validate_EmptyInterviewTimes_ThrowsException() {
         // given
-        ApplyFormCreateOrUpdateRequest emptyTimesReq = new ApplyFormCreateOrUpdateRequest(
-                "이름", "학과", "학번", 1, "010", "G", "I", "L", "S", List.of());
+        ApplyFormCreateOrUpdateRequest emptyTimesReq =
+                new ApplyFormCreateOrUpdateRequest(
+                        "이름", "학과", "학번", 1, "010", "G", "I", "L", "S", List.of());
         // when & then
-        GeneralException exception = assertThrows(GeneralException.class, () -> applyFormService.create(emptyTimesReq));
+        GeneralException exception =
+                assertThrows(GeneralException.class, () -> applyFormService.create(emptyTimesReq));
         assertThat(exception.getErrorCode()).isEqualTo(ApplyFormErrorCode.INVALID_INTERVIEW_TIMES);
     }
 
@@ -214,10 +231,12 @@ class ApplyFormServiceTest {
     @DisplayName("currentPreUser - 유저를 찾을 수 없는 경우 예외 발생")
     void currentPreUser_UserNotFound() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
+        when(preUserRepository.findByUsernameAndIsLock(username, false))
+                .thenReturn(Optional.empty());
 
         // when & then
-        GeneralException exception = assertThrows(GeneralException.class, () -> applyFormService.read());
+        GeneralException exception =
+                assertThrows(GeneralException.class, () -> applyFormService.read());
         assertThat(exception.getErrorCode()).isEqualTo(ApplyFormErrorCode.USER_NOT_FOUND);
     }
 }

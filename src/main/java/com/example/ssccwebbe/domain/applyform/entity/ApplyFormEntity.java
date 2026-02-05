@@ -33,7 +33,10 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "apply_form_entity", uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
+@Table(
+        name = "apply_form_entity",
+        uniqueConstraints =
+                @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

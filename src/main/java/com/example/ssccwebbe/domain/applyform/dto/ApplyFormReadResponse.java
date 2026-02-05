@@ -21,6 +21,5 @@ public record ApplyFormReadResponse(
         String techStackText,
         ApplyFormStatus status,
         List<InterviewTime> interviewTimes) {
-    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
-    }
+    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {}
 }
