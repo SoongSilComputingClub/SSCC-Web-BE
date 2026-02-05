@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
+
 // 지원서 조회 응답을 위한 DTO
 public record ApplyFormReadResponse(
         Long applyFormId,
@@ -17,7 +19,8 @@ public record ApplyFormReadResponse(
         String introduce,
         String codingLevel,
         String techStackText,
-        String status,
+        ApplyFormStatus status,
         List<InterviewTime> interviewTimes) {
-    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {}
+    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
+    }
 }

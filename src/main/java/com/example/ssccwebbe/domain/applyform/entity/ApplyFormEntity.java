@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,17 +33,11 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(
-        name = "apply_form_entity",
-        uniqueConstraints =
-                @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
+@Table(name = "apply_form_entity", uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApplyFormEntity {
-
-    private static final String STATUS_SUBMITTED = "SUBMITTED";
-    private static final String STATUS_DELETED = "DELETED";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,8 +75,9 @@ public class ApplyFormEntity {
     @Column(name = "tech_stack_text", nullable = false, length = 2000)
     private String techStackText;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private ApplyFormStatus status;
 
     @CreatedDate
     @Column(name = "created_date", updatable = false)
@@ -104,7 +101,7 @@ public class ApplyFormEntity {
                 req.introduce(),
                 req.codingLevel(),
                 req.techStackText(),
-                STATUS_SUBMITTED,
+                ApplyFormStatus.SUBMITTED,
                 null,
                 null);
     }
@@ -125,16 +122,16 @@ public class ApplyFormEntity {
 
     // 소프트 delete
     public void softDelete() {
-        this.status = STATUS_DELETED;
+        this.status = ApplyFormStatus.DELETED;
     }
 
     // 소프트 delete된 지원서 복구 (재작성 시)
     public void restoreSubmitted() {
-        this.status = STATUS_SUBMITTED;
+        this.status = ApplyFormStatus.SUBMITTED;
     }
 
     // 소프트 delete 여부
     public boolean isDeleted() {
-        return STATUS_DELETED.equals(this.status);
+        return ApplyFormStatus.DELETED.equals(this.status);
     }
 }
