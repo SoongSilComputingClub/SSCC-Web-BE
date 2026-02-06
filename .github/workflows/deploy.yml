@@ -21,7 +21,11 @@
 #   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
 #   - DATABASE_USER       : DB 사용자명
 #   - DATABASE_PASSWORD   : DB 비밀번호
-#   - JWT_SECRET          : JWT 서명 키
+#   - JWT_SECRET_KEY      : JWT 서명 키
+#   - GOOGLE_CLIENT_NAME  : Google OAuth2 클라이언트 이름
+#   - GOOGLE_CLIENT_ID    : Google OAuth2 클라이언트 ID
+#   - GOOGLE_CLIENT_SECRET : Google OAuth2 클라이언트 시크릿
+#   - GOOGLE_REDIRECT_URI : Google OAuth2 리디렉션 URI (e.g., https://api.example.com/login/oauth2/code/google)
 #   - OTEL_EXPORTER_OTLP_ENDPOINT : OpenTelemetry 수집 엔드포인트 (선택)
 # ============================================================================
 
@@ -181,8 +185,12 @@ jobs:
                 "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
                 "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
                 "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
-                "JWT_SECRET": "${{ secrets.JWT_SECRET }}",
-                "OTEL_EXPORTER_OTLP_ENDPOINT": "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
+                "JWT_SECRET_KEY": "${{ secrets.JWT_SECRET_KEY }}",
+                "OTEL_EXPORTER_OTLP_ENDPOINT": "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}",
+                "GOOGLE_CLIENT_NAME": "${{ secrets.GOOGLE_CLIENT_NAME }}",
+                "GOOGLE_CLIENT_ID": "${{ secrets.GOOGLE_CLIENT_ID }}",
+                "GOOGLE_CLIENT_SECRET": "${{ secrets.GOOGLE_CLIENT_SECRET }}",
+                "GOOGLE_REDIRECT_URI": "${{ secrets.GOOGLE_REDIRECT_URI }}"
               }
             }')
 
