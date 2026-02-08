@@ -16,8 +16,7 @@
 #
 # GitHub Secrets (Settings > Secrets and variables > Actions > Secrets):
 #   - COOLIFY_WEBHOOK     : Coolify 배포 webhook URL
-#   - COOLIFY_TOKEN       : Coolify webhook 인증 토큰
-#   - COOLIFY_API_TOKEN   : Coolify API Token (환경변수 주입용)
+#   - COOLIFY_TOKEN   : Coolify API Token (환경변수 주입 + webhook 인증)
 #   - COOLIFY_URL         : Coolify 서버 URL (e.g., https://coolify.example.com)
 #   - COOLIFY_SERVICE_ID  : Coolify 애플리케이션 서비스 UUID
 #   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
@@ -183,7 +182,7 @@ jobs:
       - name: Update Coolify environment variables
         env:
           COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
-          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_SERVICE_ID: ${{ secrets.COOLIFY_SERVICE_ID }}
         run: |
           set_env() {
@@ -192,7 +191,7 @@ jobs:
             BODY=$(jq -n --arg k "$key" --arg v "$value" '{key: $k, value: $v}')
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               -X POST "$COOLIFY_URL/api/v1/applications/$COOLIFY_SERVICE_ID/envs" \
-              -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
+              -H "Authorization: Bearer $COOLIFY_TOKEN" \
               -H "Content-Type: application/json" \
               -d "$BODY")
 
