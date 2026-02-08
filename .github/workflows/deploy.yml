@@ -5,7 +5,7 @@
 #   - Integrate workflow 성공 후 자동 실행
 #   - integrate에서 생성된 JAR artifact 사용 (빌드 재수행 없음)
 #   - Docker 이미지 빌드 및 GHCR 푸시
-#   - Coolify API로 환경변수 업데이트 및 배포 트리거
+#   - Coolify webhook으로 배포 트리거 (Coolify가 GHCR에서 이미지 pull)
 #
 # Job 구조:
 #   prepare ──> build-image ──> deploy
@@ -15,20 +15,22 @@
 #   - 수동 실행 (workflow_dispatch) - 최근 성공한 integrate run의 artifact 사용
 #
 # GitHub Secrets (Settings > Secrets and variables > Actions > Secrets):
-#   - COOLIFY_API_TOKEN   : Coolify API Token (Settings > API Tokens에서 생성)
+#   - COOLIFY_WEBHOOK     : Coolify 배포 webhook URL
+#   - COOLIFY_TOKEN       : Coolify webhook 인증 토큰
+#   - COOLIFY_API_TOKEN   : Coolify API Token (환경변수 주입용)
 #   - COOLIFY_URL         : Coolify 서버 URL (e.g., https://coolify.example.com)
 #   - COOLIFY_SERVICE_ID  : Coolify 애플리케이션 서비스 UUID
 #   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
 #   - DATABASE_USER       : DB 사용자명
 #   - DATABASE_PASSWORD   : DB 비밀번호
 #   - JWT_SECRET_KEY      : JWT 서명 키
-#   - JWT_ACCESS_TOKEN_EXPIRES_IN : JWT Access Token 만료 시간 (ms, 기본: 3600000 = 1시간) (선택)
-#   - JWT_REFRESH_TOKEN_EXPIRES_IN : JWT Refresh Token 만료 시간 (ms, 기본: 604800000 = 7일) (선택)
+#   - JWT_ACCESS_TOKEN_EXPIRES_IN : JWT Access Token 만료 시간 (ms, 기본: 3600000)
+#   - JWT_REFRESH_TOKEN_EXPIRES_IN : JWT Refresh Token 만료 시간 (ms, 기본: 604800000)
 #   - GOOGLE_CLIENT_NAME  : Google OAuth2 클라이언트 이름
 #   - GOOGLE_CLIENT_ID    : Google OAuth2 클라이언트 ID
 #   - GOOGLE_CLIENT_SECRET : Google OAuth2 클라이언트 시크릿
-#   - GOOGLE_REDIRECT_URI : Google OAuth2 리디렉션 URI (e.g., https://api.example.com/login/oauth2/code/google)
-#   - FRONTEND_URL        : 프론트엔드 URL (기본: http://localhost:5173) (선택)
+#   - GOOGLE_REDIRECT_URI : Google OAuth2 리디렉션 URI
+#   - FRONTEND_URL        : 프론트엔드 URL (선택, 기본: http://localhost:5173)
 #   - OTEL_EXPORTER_OTLP_ENDPOINT : OpenTelemetry 수집 엔드포인트 (선택)
 # ============================================================================
 
@@ -128,16 +130,12 @@ jobs:
   # Build Image Job - Docker 빌드 및 GHCR 푸시
   # ==========================================================================
   build-image:
-    name: Build Image
     runs-on: ubuntu-latest
     needs: [prepare]
 
     permissions:
       contents: read
       packages: write
-
-    outputs:
-      image_tag: ${{ needs.prepare.outputs.head_sha }}
 
     steps:
       - name: Checkout code
@@ -172,7 +170,9 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ==========================================================================
-  # Deploy Job - Coolify 환경변수 업데이트 및 배포 트리거
+  # Deploy Job - Coolify 환경변수 주입 후 webhook으로 배포 트리거
+  # 사전 조건: Coolify 대시보드에서 이미지 소스가
+  #            ghcr.io/<owner>/sscc-web-be:latest (소문자) 로 설정되어 있어야 함
   # ==========================================================================
   deploy:
     name: Deploy
@@ -181,43 +181,51 @@ jobs:
 
     steps:
       - name: Update Coolify environment variables
+        env:
+          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
+          COOLIFY_API_TOKEN: ${{ secrets.COOLIFY_API_TOKEN }}
+          COOLIFY_SERVICE_ID: ${{ secrets.COOLIFY_SERVICE_ID }}
+        run: |
+          set_env() {
+            local key="$1"
+            local value="$2"
+            BODY=$(jq -n --arg k "$key" --arg v "$value" '{key: $k, value: $v}')
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST "$COOLIFY_URL/api/v1/services/$COOLIFY_SERVICE_ID/envs" \
+              -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "$BODY")
+
+            if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+              echo "::error::Failed to set $key (HTTP $HTTP_STATUS)"
+              exit 1
+            fi
+            echo "Set $key (HTTP $HTTP_STATUS)"
+          }
+
+          set_env "SPRING_PROFILES_ACTIVE" "prod"
+          set_env "DATABASE_URL" "${{ secrets.DATABASE_URL }}"
+          set_env "DATABASE_USER" "${{ secrets.DATABASE_USER }}"
+          set_env "DATABASE_PASSWORD" "${{ secrets.DATABASE_PASSWORD }}"
+          set_env "JWT_SECRET_KEY" "${{ secrets.JWT_SECRET_KEY }}"
+          set_env "JWT_ACCESS_TOKEN_EXPIRES_IN" "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}"
+          set_env "JWT_REFRESH_TOKEN_EXPIRES_IN" "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}"
+          set_env "GOOGLE_CLIENT_NAME" "${{ secrets.GOOGLE_CLIENT_NAME }}"
+          set_env "GOOGLE_CLIENT_ID" "${{ secrets.GOOGLE_CLIENT_ID }}"
+          set_env "GOOGLE_CLIENT_SECRET" "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          set_env "GOOGLE_REDIRECT_URI" "${{ secrets.GOOGLE_REDIRECT_URI }}"
+          set_env "FRONTEND_URL" "${{ secrets.FRONTEND_URL }}"
+          set_env "OTEL_EXPORTER_OTLP_ENDPOINT" "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
+          echo "All environment variables updated successfully"
+
+      - name: Deploy to Coolify via webhook
         run: |
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_ID }}/env" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "variables": {
-                "SPRING_PROFILES_ACTIVE": "prod",
-                "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
-                "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
-                "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
-                "JWT_SECRET_KEY": "${{ secrets.JWT_SECRET_KEY }}",
-                "JWT_ACCESS_TOKEN_EXPIRES_IN": "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}",
-                "JWT_REFRESH_TOKEN_EXPIRES_IN": "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}",
-                "GOOGLE_CLIENT_NAME": "${{ secrets.GOOGLE_CLIENT_NAME }}",
-                "GOOGLE_CLIENT_ID": "${{ secrets.GOOGLE_CLIENT_ID }}",
-                "GOOGLE_CLIENT_SECRET": "${{ secrets.GOOGLE_CLIENT_SECRET }}",
-                "GOOGLE_REDIRECT_URI": "${{ secrets.GOOGLE_REDIRECT_URI }}",
-                "FRONTEND_URL": "${{ secrets.FRONTEND_URL }}",
-                "OTEL_EXPORTER_OTLP_ENDPOINT": "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
-              }
-            }')
+            --request GET '${{ secrets.COOLIFY_WEBHOOK }}' \
+            --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}')
 
           if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
-            echo "::error::Coolify ENV update failed with HTTP $HTTP_STATUS"
-            exit 1
-          fi
-          echo "Coolify ENV updated successfully (HTTP $HTTP_STATUS)"
-
-      - name: Trigger Coolify deployment
-        run: |
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            -X POST "${{ secrets.COOLIFY_URL }}/api/v1/services/${{ secrets.COOLIFY_SERVICE_ID }}/deploy" \
-            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_TOKEN }}")
-
-          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
-            echo "::error::Coolify deploy trigger failed with HTTP $HTTP_STATUS"
+            echo "::error::Coolify deployment failed with HTTP $HTTP_STATUS"
             exit 1
           fi
           echo "Coolify deployment triggered successfully (HTTP $HTTP_STATUS)"
