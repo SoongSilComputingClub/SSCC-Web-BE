@@ -21,7 +21,14 @@
 #   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
 #   - DATABASE_USER       : DB 사용자명
 #   - DATABASE_PASSWORD   : DB 비밀번호
-#   - JWT_SECRET          : JWT 서명 키
+#   - JWT_SECRET_KEY      : JWT 서명 키
+#   - JWT_ACCESS_TOKEN_EXPIRES_IN : JWT Access Token 만료 시간 (ms, 기본: 3600000 = 1시간) (선택)
+#   - JWT_REFRESH_TOKEN_EXPIRES_IN : JWT Refresh Token 만료 시간 (ms, 기본: 604800000 = 7일) (선택)
+#   - GOOGLE_CLIENT_NAME  : Google OAuth2 클라이언트 이름
+#   - GOOGLE_CLIENT_ID    : Google OAuth2 클라이언트 ID
+#   - GOOGLE_CLIENT_SECRET : Google OAuth2 클라이언트 시크릿
+#   - GOOGLE_REDIRECT_URI : Google OAuth2 리디렉션 URI (e.g., https://api.example.com/login/oauth2/code/google)
+#   - FRONTEND_URL        : 프론트엔드 URL (기본: http://localhost:5173) (선택)
 #   - OTEL_EXPORTER_OTLP_ENDPOINT : OpenTelemetry 수집 엔드포인트 (선택)
 # ============================================================================
 
@@ -181,7 +188,14 @@ jobs:
                 "DATABASE_URL": "${{ secrets.DATABASE_URL }}",
                 "DATABASE_USER": "${{ secrets.DATABASE_USER }}",
                 "DATABASE_PASSWORD": "${{ secrets.DATABASE_PASSWORD }}",
-                "JWT_SECRET": "${{ secrets.JWT_SECRET }}",
+                "JWT_SECRET_KEY": "${{ secrets.JWT_SECRET_KEY }}",
+                "JWT_ACCESS_TOKEN_EXPIRES_IN": "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}",
+                "JWT_REFRESH_TOKEN_EXPIRES_IN": "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}",
+                "GOOGLE_CLIENT_NAME": "${{ secrets.GOOGLE_CLIENT_NAME }}",
+                "GOOGLE_CLIENT_ID": "${{ secrets.GOOGLE_CLIENT_ID }}",
+                "GOOGLE_CLIENT_SECRET": "${{ secrets.GOOGLE_CLIENT_SECRET }}",
+                "GOOGLE_REDIRECT_URI": "${{ secrets.GOOGLE_REDIRECT_URI }}",
+                "FRONTEND_URL": "${{ secrets.FRONTEND_URL }}",
                 "OTEL_EXPORTER_OTLP_ENDPOINT": "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
               }
             }')

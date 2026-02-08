@@ -20,10 +20,10 @@ spring:
         registration:
           # Google registration
           google:
-            client-name: ${goole-client-name}
-            client-id: ${google-client-id}
-            client-secret: ${google-client-secret}
-            redirect-uri: ${google-redirect-uri}
+            client-name: ${GOOGLE_CLIENT_NAME}
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
             scope:
               - profile
