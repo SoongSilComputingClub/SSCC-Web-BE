@@ -191,7 +191,7 @@ jobs:
             local value="$2"
             BODY=$(jq -n --arg k "$key" --arg v "$value" '{key: $k, value: $v}')
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -X POST "$COOLIFY_URL/api/v1/services/$COOLIFY_SERVICE_ID/envs" \
+              -X POST "$COOLIFY_URL/api/v1/applications/$COOLIFY_SERVICE_ID/envs" \
               -H "Authorization: Bearer $COOLIFY_API_TOKEN" \
               -H "Content-Type: application/json" \
               -d "$BODY")
