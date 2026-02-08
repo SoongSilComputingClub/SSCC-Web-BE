@@ -45,3 +45,19 @@ logging:
   level:
     root: INFO
     org.hibernate.SQL: WARN
+
+#OpenTelemetry : off
+otel:
+  sdk:
+    disabled: true
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
