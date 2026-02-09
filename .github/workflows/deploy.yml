@@ -185,37 +185,52 @@ jobs:
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
           COOLIFY_SERVICE_ID: ${{ secrets.COOLIFY_SERVICE_ID }}
         run: |
-          set_env() {
-            local key="$1"
-            local value="$2"
-            BODY=$(jq -n --arg k "$key" --arg v "$value" '{key: $k, value: $v}')
-            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-              -X POST "$COOLIFY_URL/api/v1/applications/$COOLIFY_SERVICE_ID/envs" \
-              -H "Authorization: Bearer $COOLIFY_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "$BODY")
+          # Build JSON array of all environment variables
+          ENV_DATA=$(jq -n \
+            --arg spring_profile "prod" \
+            --arg db_url "${{ secrets.DATABASE_URL }}" \
+            --arg db_user "${{ secrets.DATABASE_USER }}" \
+            --arg db_pass "${{ secrets.DATABASE_PASSWORD }}" \
+            --arg jwt_secret "${{ secrets.JWT_SECRET_KEY }}" \
+            --arg jwt_access_ttl "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}" \
+            --arg jwt_refresh_ttl "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}" \
+            --arg google_name "${{ secrets.GOOGLE_CLIENT_NAME }}" \
+            --arg google_id "${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --arg google_secret "${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --arg google_redirect "${{ secrets.GOOGLE_REDIRECT_URI }}" \
+            --arg frontend_url "${{ secrets.FRONTEND_URL }}" \
+            --arg otel_endpoint "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}" \
+            '{
+              data: [
+                {key: "SPRING_PROFILES_ACTIVE", value: $spring_profile, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "DATABASE_URL", value: $db_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "DATABASE_USER", value: $db_user, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "DATABASE_PASSWORD", value: $db_pass, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "JWT_SECRET_KEY", value: $jwt_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "JWT_ACCESS_TOKEN_EXPIRES_IN", value: $jwt_access_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "JWT_REFRESH_TOKEN_EXPIRES_IN", value: $jwt_refresh_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "GOOGLE_CLIENT_NAME", value: $google_name, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "GOOGLE_CLIENT_ID", value: $google_id, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "GOOGLE_CLIENT_SECRET", value: $google_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "GOOGLE_REDIRECT_URI", value: $google_redirect, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "FRONTEND_URL", value: $frontend_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "OTEL_EXPORTER_OTLP_ENDPOINT", value: $otel_endpoint, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false}
+              ]
+            }'
+          )
 
-            if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
-              echo "::error::Failed to set $key (HTTP $HTTP_STATUS)"
-              exit 1
-            fi
-            echo "Set $key (HTTP $HTTP_STATUS)"
-          }
+          # Send bulk update request
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X PATCH "$COOLIFY_URL/api/v1/applications/$COOLIFY_SERVICE_ID/envs/bulk" \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$ENV_DATA")
 
-          set_env "SPRING_PROFILES_ACTIVE" "prod"
-          set_env "DATABASE_URL" "${{ secrets.DATABASE_URL }}"
-          set_env "DATABASE_USER" "${{ secrets.DATABASE_USER }}"
-          set_env "DATABASE_PASSWORD" "${{ secrets.DATABASE_PASSWORD }}"
-          set_env "JWT_SECRET_KEY" "${{ secrets.JWT_SECRET_KEY }}"
-          set_env "JWT_ACCESS_TOKEN_EXPIRES_IN" "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}"
-          set_env "JWT_REFRESH_TOKEN_EXPIRES_IN" "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}"
-          set_env "GOOGLE_CLIENT_NAME" "${{ secrets.GOOGLE_CLIENT_NAME }}"
-          set_env "GOOGLE_CLIENT_ID" "${{ secrets.GOOGLE_CLIENT_ID }}"
-          set_env "GOOGLE_CLIENT_SECRET" "${{ secrets.GOOGLE_CLIENT_SECRET }}"
-          set_env "GOOGLE_REDIRECT_URI" "${{ secrets.GOOGLE_REDIRECT_URI }}"
-          set_env "FRONTEND_URL" "${{ secrets.FRONTEND_URL }}"
-          set_env "OTEL_EXPORTER_OTLP_ENDPOINT" "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}"
-          echo "All environment variables updated successfully"
+          if [ "$HTTP_STATUS" -ne 201 ]; then
+            echo "::error::Failed to update environment variables (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+          echo "Successfully updated all environment variables (HTTP $HTTP_STATUS)"
 
       - name: Deploy to Coolify via webhook
         run: |
