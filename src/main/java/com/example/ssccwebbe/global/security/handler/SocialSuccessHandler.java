@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.Map;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -29,6 +29,12 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
 
     @Value("${frontend.cookie.secure}")
     private boolean cookieSecure;
+
+    @Value("${frontend.cookie.same-site}")
+    private String cookieSameSite;
+
+    @Value("${frontend.cookie.http-only}")
+    private boolean cookieHttpOnly;
 
     public SocialSuccessHandler(@Qualifier("preJwtService") JwtService preJwtService) {
         // JWT Service 매핑 (Strategy 패턴)
@@ -62,14 +68,17 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
         // 발급한 Refresh DB 테이블 저장 (Refresh whitelist)
         jwtService.addRefresh(username, refreshToken);
 
-        // 응답
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(cookieSecure);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(10); // 10초 (프론트에서 발급 후 바로 헤더 전환 로직 진행 예정)
+        // 응답 (ResponseCookie 사용 - SameSite 속성 지원)
+        ResponseCookie refreshCookie =
+                ResponseCookie.from("refreshToken", refreshToken)
+                        .httpOnly(cookieHttpOnly)
+                        .secure(cookieSecure)
+                        .path("/")
+                        .maxAge(10) // 10초 (프론트에서 발급 후 바로 헤더 전환 로직 진행 예정)
+                        .sameSite(cookieSameSite) // SameSite 속성 추가
+                        .build();
 
-        response.addCookie(refreshCookie);
+        response.addHeader("Set-Cookie", refreshCookie.toString());
         response.sendRedirect(frontendUrl + "/cookie"); // 프론트 주소로 redirect
     }
 
