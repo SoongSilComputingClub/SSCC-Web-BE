@@ -32,12 +32,12 @@ spring:
 # JWT Configuration (production uses environment variables)
 jwt:
   secret-key: ${JWT_SECRET_KEY}
-  access-token-expires-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN:3600000}
-  refresh-token-expires-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN:604800000}
+  access-token-expires-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN}
+  refresh-token-expires-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN}
 
 # Frontend Configuration
 frontend:
-  url: ${FRONTEND_URL:http://localhost:5173}
+  url: ${FRONTEND_URL}
   cookie:
     secure: true
 
