@@ -39,7 +39,9 @@ jwt:
 frontend:
   url: ${FRONTEND_URL}
   cookie:
+    same-site: none
     secure: true
+    http-only: true
 
 logging:
   level:
