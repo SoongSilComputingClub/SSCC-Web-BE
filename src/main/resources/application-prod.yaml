@@ -40,6 +40,8 @@ frontend:
   url: ${FRONTEND_URL}
   cookie:
     secure: true
+    same-site: none
+    http-only: true
 
 logging:
   level:

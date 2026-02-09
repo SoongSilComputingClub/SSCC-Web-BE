@@ -42,6 +42,8 @@ frontend:
   url: http://localhost:5173
   cookie:
     secure: false
+    same-site: none
+    http-only: true
 
 logging:
   level:
