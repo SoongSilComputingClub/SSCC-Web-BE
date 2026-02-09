@@ -19,6 +19,7 @@
 #   - COOLIFY_TOKEN   : Coolify API Token (환경변수 주입 + webhook 인증)
 #   - COOLIFY_URL         : Coolify 서버 URL (e.g., https://coolify.example.com)
 #   - COOLIFY_SERVICE_ID  : Coolify 애플리케이션 서비스 UUID
+#   - SPRING_PROFILE      : Spring 프로필 (예: prod, local, test)
 #   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
 #   - DATABASE_USER       : DB 사용자명
 #   - DATABASE_PASSWORD   : DB 비밀번호
@@ -187,7 +188,7 @@ jobs:
         run: |
           # Build JSON array of all environment variables
           ENV_DATA=$(jq -n \
-            --arg spring_profile "prod" \
+            --arg spring_profile "${{ secrets.SPRING_PROFILE }}" \
             --arg db_url "${{ secrets.DATABASE_URL }}" \
             --arg db_user "${{ secrets.DATABASE_USER }}" \
             --arg db_pass "${{ secrets.DATABASE_PASSWORD }}" \
