@@ -85,6 +85,8 @@ frontend:
   url: http://localhost:5173
   cookie:
     secure: false
+    same-site: Lax      # 기본값 (로컬 개발용)
+    http-only: true
 
 logging:
   level:
