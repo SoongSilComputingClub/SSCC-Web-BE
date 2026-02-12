@@ -178,8 +178,10 @@ public class ApplyFormService {
                 form.getPhone(),
                 form.getGender(),
                 form.getIntroduce(),
-                form.getCodingLevel(),
+                form.getCodingExp(),
                 form.getTechStackText(),
+                form.getWantedValue(),
+                form.getAspiration(),
                 form.getStatus(),
                 times);
     }

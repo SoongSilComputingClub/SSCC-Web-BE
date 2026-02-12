@@ -7,6 +7,8 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+
 // 지원서 생성/수정 요청 DTO.
 // 면접 희망 시간은 N개 선택 가능하므로 List로 받음
 
@@ -18,8 +20,10 @@ public record ApplyFormCreateOrUpdateRequest(
         @NotBlank String phone,
         @NotBlank String gender,
         @NotBlank String introduce,
-        @NotBlank String codingLevel,
+        @NotNull CodingExp codingExp,
         @NotBlank String techStackText,
+        @NotBlank String wantedValue,
+        @NotBlank String aspiration,
         @NotNull List<InterviewTime> interviewTimes) {
 
     // date + startTime + endTime 형태로 그대로 저장
