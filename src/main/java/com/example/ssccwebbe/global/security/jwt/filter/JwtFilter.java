@@ -49,10 +49,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("[JwtFilter] Authorization header found");
 
-
         if (!authorization.startsWith("Bearer ")) {
             log.error(
-                    "[JwtFilter] Invalid token format - Authorization header does not start with 'Bearer '");
+                    "[JwtFilter] Invalid token format - Authorization header does not start with"
+                            + " 'Bearer '");
             // ApiResponse 형식으로 응답 작성
             response.setStatus(JwtErrorCode.INVALID_TOKEN_FORMAT.getHttpStatus().value());
             response.setContentType("application/json;charset=UTF-8");
@@ -68,9 +68,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰 파싱
         String accessToken = authorization.split(" ")[1];
         String tokenPreview =
-                accessToken.length() > 20
-                        ? accessToken.substring(0, 20) + "..."
-                        : accessToken;
+                accessToken.length() > 20 ? accessToken.substring(0, 20) + "..." : accessToken;
         log.info("[JwtFilter] Extracted token: {}", tokenPreview);
 
         // 토큰 검증
@@ -80,10 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = JwtUtil.getUsername(accessToken);
             String role = JwtUtil.getRole(accessToken);
 
-            log.info(
-                    "[JwtFilter] Token valid - Username: {}, Role: {}",
-                    username,
-                    role);
+            log.info("[JwtFilter] Token valid - Username: {}, Role: {}", username, role);
 
             List<GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(role));
