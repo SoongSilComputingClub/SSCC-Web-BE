@@ -21,7 +21,7 @@ public record ApplyFormCreateOrUpdateRequest(
         @NotBlank String gender,
         @NotBlank String introduce,
         @NotNull CodingExp codingExp,
-        @NotBlank String techStackText,
+        String techStackText,
         @NotBlank String wantedValue,
         @NotBlank String aspiration,
         @NotNull List<InterviewTime> interviewTimes) {
