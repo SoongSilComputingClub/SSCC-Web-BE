@@ -27,6 +27,7 @@ import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
+import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
@@ -66,7 +67,7 @@ class ApplyFormServiceTest {
                                 "010-1234-5678",
                                 "MALE",
                                 "자기소개",
-                                "학교 교과목, 동아리에서 배운 내용을 활용해봤다.",
+                                CodingExp.C,
                                 "Java, Spring",
                                 "SSCC에서 다양한 사람들을 만나고 싶습니다.",
                                 "열심히 하겠습니다!",
@@ -191,7 +192,7 @@ class ApplyFormServiceTest {
                                 "010-0000-0000",
                                 "FEMALE",
                                 "수정소개",
-                                "토이 프로젝트를 진행해봤다.",
+                                CodingExp.D,
                                 "stack",
                                 "updatedValue",
                                 "updatedAspiration",
@@ -227,7 +228,7 @@ class ApplyFormServiceTest {
         void validate_EmptyInterviewTimes_ThrowsException() {
                 // given
                 ApplyFormCreateOrUpdateRequest emptyTimesReq = new ApplyFormCreateOrUpdateRequest(
-                                "이름", "학과", "학번", 1, "010", "G", "I", "L", "S", "V", "A", List.of());
+                                "이름", "학과", "학번", 1, "010", "G", "I", CodingExp.A, "S", "V", "A", List.of());
                 // when & then
                 GeneralException exception = assertThrows(GeneralException.class,
                                 () -> applyFormService.create(emptyTimesReq));

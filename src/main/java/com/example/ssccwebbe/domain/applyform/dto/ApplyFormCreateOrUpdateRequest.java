@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,7 +20,7 @@ public record ApplyFormCreateOrUpdateRequest(
                 @NotBlank String phone,
                 @NotBlank String gender,
                 @NotBlank String introduce,
-                @NotBlank String codingExp,
+                @NotNull CodingExp codingExp,
                 @NotBlank String techStackText,
                 @NotBlank String wantedValue,
                 @NotBlank String aspiration,

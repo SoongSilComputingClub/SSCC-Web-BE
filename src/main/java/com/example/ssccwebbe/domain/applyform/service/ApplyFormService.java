@@ -12,6 +12,7 @@ import com.example.ssccwebbe.domain.applyform.dto.ApplyFormCreateOrUpdateRequest
 import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
+import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;

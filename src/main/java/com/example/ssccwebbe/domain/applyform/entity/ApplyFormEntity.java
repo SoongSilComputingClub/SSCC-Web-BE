@@ -69,8 +69,9 @@ public class ApplyFormEntity {
     @Column(nullable = false, length = 2000)
     private String introduce;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "coding_exp", nullable = false)
-    private String codingExp;
+    private CodingExp codingExp;
 
     @Column(name = "tech_stack_text", nullable = false, length = 2000)
     private String techStackText;
