@@ -24,6 +24,5 @@ public record ApplyFormReadResponse(
         String aspiration,
         ApplyFormStatus status,
         List<InterviewTime> interviewTimes) {
-    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
-    }
+    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {}
 }
