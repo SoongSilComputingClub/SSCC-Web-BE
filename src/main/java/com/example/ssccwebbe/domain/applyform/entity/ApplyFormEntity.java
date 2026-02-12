@@ -33,10 +33,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(
-        name = "apply_form_entity",
-        uniqueConstraints =
-                @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
+@Table(name = "apply_form_entity", uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -72,11 +69,17 @@ public class ApplyFormEntity {
     @Column(nullable = false, length = 2000)
     private String introduce;
 
-    @Column(name = "coding_level", nullable = false)
-    private String codingLevel;
+    @Column(name = "coding_exp", nullable = false)
+    private String codingExp;
 
     @Column(name = "tech_stack_text", nullable = false, length = 2000)
     private String techStackText;
+
+    @Column(name = "wanted_value", nullable = false, length = 2000)
+    private String wantedValue;
+
+    @Column(nullable = false, length = 2000)
+    private String aspiration;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -102,8 +105,10 @@ public class ApplyFormEntity {
                 req.phone(),
                 req.gender(),
                 req.introduce(),
-                req.codingLevel(),
+                req.codingExp(),
                 req.techStackText(),
+                req.wantedValue(),
+                req.aspiration(),
                 ApplyFormStatus.SUBMITTED,
                 null,
                 null);
@@ -119,8 +124,10 @@ public class ApplyFormEntity {
         this.phone = req.phone();
         this.gender = req.gender();
         this.introduce = req.introduce();
-        this.codingLevel = req.codingLevel();
+        this.codingExp = req.codingExp();
         this.techStackText = req.techStackText();
+        this.wantedValue = req.wantedValue();
+        this.aspiration = req.aspiration();
     }
 
     // 소프트 delete

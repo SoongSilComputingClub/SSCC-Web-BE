@@ -11,19 +11,22 @@ import jakarta.validation.constraints.NotNull;
 // 면접 희망 시간은 N개 선택 가능하므로 List로 받음
 
 public record ApplyFormCreateOrUpdateRequest(
-        @NotBlank String applicantName,
-        @NotBlank String department,
-        @NotBlank String studentNo,
-        @NotNull Integer grade,
-        @NotBlank String phone,
-        @NotBlank String gender,
-        @NotBlank String introduce,
-        @NotBlank String codingLevel,
-        @NotBlank String techStackText,
-        @NotNull List<InterviewTime> interviewTimes) {
+                @NotBlank String applicantName,
+                @NotBlank String department,
+                @NotBlank String studentNo,
+                @NotNull Integer grade,
+                @NotBlank String phone,
+                @NotBlank String gender,
+                @NotBlank String introduce,
+                @NotBlank String codingExp,
+                @NotBlank String techStackText,
+                @NotBlank String wantedValue,
+                @NotBlank String aspiration,
+                @NotNull List<InterviewTime> interviewTimes) {
 
-    // date + startTime + endTime 형태로 그대로 저장
+        // date + startTime + endTime 형태로 그대로 저장
 
-    public record InterviewTime(
-            @NotNull LocalDate date, @NotNull LocalTime startTime, @NotNull LocalTime endTime) {}
+        public record InterviewTime(
+                        @NotNull LocalDate date, @NotNull LocalTime startTime, @NotNull LocalTime endTime) {
+        }
 }

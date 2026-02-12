@@ -17,9 +17,12 @@ public record ApplyFormReadResponse(
         String phone,
         String gender,
         String introduce,
-        String codingLevel,
+        String codingExp,
         String techStackText,
+        String wantedValue,
+        String aspiration,
         ApplyFormStatus status,
         List<InterviewTime> interviewTimes) {
-    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {}
+    public record InterviewTime(LocalDate date, LocalTime startTime, LocalTime endTime) {
+    }
 }
