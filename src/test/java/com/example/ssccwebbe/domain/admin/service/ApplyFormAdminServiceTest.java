@@ -25,13 +25,10 @@ import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
 @ExtendWith(MockitoExtension.class)
 class ApplyFormAdminServiceTest {
 
-    @Mock
-    private ApplyFormRepository applyFormRepository;
-    @Mock
-    private ApplyFormInterviewTimeRepository interviewTimeRepository;
+    @Mock private ApplyFormRepository applyFormRepository;
+    @Mock private ApplyFormInterviewTimeRepository interviewTimeRepository;
 
-    @InjectMocks
-    private ApplyFormAdminService applyFormAdminService;
+    @InjectMocks private ApplyFormAdminService applyFormAdminService;
 
     @Test
     @DisplayName("getGenderDistribution - 성별 분포 조회 성공")
@@ -103,7 +100,8 @@ class ApplyFormAdminServiceTest {
         when(form.getStatus()).thenReturn(ApplyFormStatus.SUBMITTED);
         when(form.getCodingExp()).thenReturn(CodingExp.C);
 
-        when(applyFormRepository.findAllByStatusNot(ApplyFormStatus.DELETED)).thenReturn(List.of(form));
+        when(applyFormRepository.findAllByStatusNot(ApplyFormStatus.DELETED))
+                .thenReturn(List.of(form));
         when(interviewTimeRepository.findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form))
                 .thenReturn(List.of());
 
