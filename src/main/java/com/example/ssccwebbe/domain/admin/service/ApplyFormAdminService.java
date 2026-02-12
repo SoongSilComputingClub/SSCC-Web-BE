@@ -25,8 +25,10 @@ public class ApplyFormAdminService {
     private final ApplyFormInterviewTimeRepository interviewTimeRepository;
 
     public GenderDistributionResponse getGenderDistribution() {
-        long maleCount = applyFormRepository.countByGenderAndStatusNot("남", ApplyFormStatus.DELETED);
-        long femaleCount = applyFormRepository.countByGenderAndStatusNot("여", ApplyFormStatus.DELETED);
+        long maleCount =
+                applyFormRepository.countByGenderAndStatusNot("남", ApplyFormStatus.DELETED);
+        long femaleCount =
+                applyFormRepository.countByGenderAndStatusNot("여", ApplyFormStatus.DELETED);
         long totalCount = applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED);
 
         double malePercentage = totalCount == 0 ? 0 : (double) maleCount / totalCount * 100;
@@ -43,19 +45,24 @@ public class ApplyFormAdminService {
     public CodingExpDistributionResponse getCodingExpDistribution() {
         long totalCount = applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED);
 
-        List<CodingExpDistributionResponse.ExpLevelDistribution> distributions = java.util.Arrays
-                .stream(CodingExp.values())
-                .map(exp -> {
-                    long count = applyFormRepository.countByCodingExpAndStatusNot(exp, ApplyFormStatus.DELETED);
-                    double percentage = totalCount == 0 ? 0 : (double) count / totalCount * 100;
-                    return CodingExpDistributionResponse.ExpLevelDistribution.builder()
-                            .level(exp.name())
-                            .description(exp.getDescription())
-                            .count(count)
-                            .percentage(Math.round(percentage * 10) / 10.0)
-                            .build();
-                })
-                .toList();
+        List<CodingExpDistributionResponse.ExpLevelDistribution> distributions =
+                java.util.Arrays.stream(CodingExp.values())
+                        .map(
+                                exp -> {
+                                    long count =
+                                            applyFormRepository.countByCodingExpAndStatusNot(
+                                                    exp, ApplyFormStatus.DELETED);
+                                    double percentage =
+                                            totalCount == 0 ? 0 : (double) count / totalCount * 100;
+                                    return CodingExpDistributionResponse.ExpLevelDistribution
+                                            .builder()
+                                            .level(exp.name())
+                                            .description(exp.getDescription())
+                                            .count(count)
+                                            .percentage(Math.round(percentage * 10) / 10.0)
+                                            .build();
+                                })
+                        .toList();
 
         return CodingExpDistributionResponse.builder()
                 .totalCount(totalCount)
@@ -70,15 +77,17 @@ public class ApplyFormAdminService {
     }
 
     private ApplyFormReadResponse toResponse(ApplyFormEntity form) {
-        List<ApplyFormReadResponse.InterviewTime> times = interviewTimeRepository
-                .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)
-                .stream()
-                .map(
-                        t -> new ApplyFormReadResponse.InterviewTime(
-                                t.getInterviewDate(),
-                                t.getStartTime(),
-                                t.getEndTime()))
-                .toList();
+        List<ApplyFormReadResponse.InterviewTime> times =
+                interviewTimeRepository
+                        .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)
+                        .stream()
+                        .map(
+                                t ->
+                                        new ApplyFormReadResponse.InterviewTime(
+                                                t.getInterviewDate(),
+                                                t.getStartTime(),
+                                                t.getEndTime()))
+                        .toList();
 
         return new ApplyFormReadResponse(
                 form.getId(),

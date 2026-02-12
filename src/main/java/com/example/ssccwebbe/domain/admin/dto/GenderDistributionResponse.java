@@ -4,8 +4,4 @@ import lombok.Builder;
 
 @Builder
 public record GenderDistributionResponse(
-        long maleCount,
-        long femaleCount,
-        double malePercentage,
-        double femalePercentage) {
-}
+        long maleCount, long femaleCount, double malePercentage, double femalePercentage) {}

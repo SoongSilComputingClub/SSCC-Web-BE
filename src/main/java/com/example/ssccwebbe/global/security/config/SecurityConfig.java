@@ -33,121 +33,125 @@ import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 @EnableWebSecurity // 시큐리티 빈 설정 활성화
 public class SecurityConfig {
 
-        private final AuthenticationSuccessHandler socialSuccessHandler;
-        private final AuthenticationFailureHandler socialFailureHandler;
-        private final AuthenticationEntryPoint authenticationEntryPoint;
-        private final AccessDeniedHandler accessDeniedHandler;
-        private final JwtService jwtService;
-        private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final AuthenticationSuccessHandler socialSuccessHandler;
+    private final AuthenticationFailureHandler socialFailureHandler;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
+    private final JwtService jwtService;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-        @Value("${frontend.url}")
-        private String frontendUrl;
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
-        // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
-        public SecurityConfig(
-                        @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
-                        @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
-                        AuthenticationEntryPoint authenticationEntryPoint,
-                        AccessDeniedHandler accessDeniedHandler,
-                        JwtService jwtService,
-                        CustomLogoutSuccessHandler customLogoutSuccessHandler) {
-                this.socialSuccessHandler = socialSuccessHandler;
-                this.socialFailureHandler = socialFailureHandler;
-                this.authenticationEntryPoint = authenticationEntryPoint;
-                this.accessDeniedHandler = accessDeniedHandler;
-                this.jwtService = jwtService;
-                this.customLogoutSuccessHandler = customLogoutSuccessHandler;
-        }
+    // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
+    public SecurityConfig(
+            @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
+            @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
+            AuthenticationEntryPoint authenticationEntryPoint,
+            AccessDeniedHandler accessDeniedHandler,
+            JwtService jwtService,
+            CustomLogoutSuccessHandler customLogoutSuccessHandler) {
+        this.socialSuccessHandler = socialSuccessHandler;
+        this.socialFailureHandler = socialFailureHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.jwtService = jwtService;
+        this.customLogoutSuccessHandler = customLogoutSuccessHandler;
+    }
 
-        // 권한 계층
-        @Bean
-        public RoleHierarchy roleHierarchy() {
-                return RoleHierarchyImpl.withRolePrefix("ROLE_")
-                                .role(UserRoleType.ADMIN.name())
-                                .implies(UserRoleType.USER.name())
-                                .role(UserRoleType.USER.name())
-                                .implies(UserRoleType.PREUSER.name())
-                                .build();
-        }
+    // 권한 계층
+    @Bean
+    public RoleHierarchy roleHierarchy() {
+        return RoleHierarchyImpl.withRolePrefix("ROLE_")
+                .role(UserRoleType.ADMIN.name())
+                .implies(UserRoleType.USER.name())
+                .role(UserRoleType.USER.name())
+                .implies(UserRoleType.PREUSER.name())
+                .build();
+    }
 
-        // CORS 빈 등록
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of(frontendUrl));
-                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("*"));
-                configuration.setAllowCredentials(true);
-                configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
-                configuration.setMaxAge(3600L);
+    // CORS 빈 등록
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+        configuration.setMaxAge(3600L);
 
-                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-                source.registerCorsConfiguration("/**", configuration);
-                return source;
-        }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
-        // 시큐리티 필터체인 설정
-        @Bean
-        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // 시큐리티 필터체인 설정
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-                // CSRF 보안 필터 disable(stateless 서버이기에 불필요함)
-                http.csrf(AbstractHttpConfigurer::disable);
+        // CSRF 보안 필터 disable(stateless 서버이기에 불필요함)
+        http.csrf(AbstractHttpConfigurer::disable);
 
-                // CORS 설정 (리액트 기반 서비스이기에 필수적)
-                http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        // CORS 설정 (리액트 기반 서비스이기에 필수적)
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-                // 기본 로그아웃 필터 + 커스텀 Refresh 토큰 삭제 핸들러 추가 + 로그아웃 성공 핸들러
-                http.logout(
-                                logout -> logout.addLogoutHandler(new RefreshTokenLogoutHandler(jwtService))
-                                                .logoutSuccessHandler(customLogoutSuccessHandler));
+        // 기본 로그아웃 필터 + 커스텀 Refresh 토큰 삭제 핸들러 추가 + 로그아웃 성공 핸들러
+        http.logout(
+                logout ->
+                        logout.addLogoutHandler(new RefreshTokenLogoutHandler(jwtService))
+                                .logoutSuccessHandler(customLogoutSuccessHandler));
 
-                // 기본 Form 기반 인증 필터들 disable => 때문에 LoginFilter.java를 등록하여 사용해야함
-                http.formLogin(AbstractHttpConfigurer::disable);
+        // 기본 Form 기반 인증 필터들 disable => 때문에 LoginFilter.java를 등록하여 사용해야함
+        http.formLogin(AbstractHttpConfigurer::disable);
 
-                // 기본 Basic 인증 필터 disable
-                http.httpBasic(AbstractHttpConfigurer::disable);
+        // 기본 Basic 인증 필터 disable
+        http.httpBasic(AbstractHttpConfigurer::disable);
 
-                // OAuth2 인증용
-                http.oauth2Login(
-                                oauth2 -> oauth2.successHandler(socialSuccessHandler)
-                                                .failureHandler(socialFailureHandler));
+        // OAuth2 인증용
+        http.oauth2Login(
+                oauth2 ->
+                        oauth2.successHandler(socialSuccessHandler)
+                                .failureHandler(socialFailureHandler));
 
-                // 인가
-                http.authorizeHttpRequests(
-                                auth -> auth.requestMatchers(
-                                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
-                                                .permitAll() // Swagger UI : 전체 허용
-                                                .requestMatchers("/jwt/exchange", "/jwt/refresh")
-                                                .permitAll() // JWT 발급 경로 : 전체 허용
-                                                .requestMatchers("/test/preuser-only")
-                                                .hasRole(UserRoleType.PREUSER.name()) // PREUSER 권한 테스트
-                                                .requestMatchers("/test")
-                                                .permitAll() // 테스트용 토큰 발급 경로 : 전체 허용
-                                                .requestMatchers(HttpMethod.POST, "/user/exist", "/user")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/user")
-                                                .hasRole(UserRoleType.PREUSER.name())
-                                                .requestMatchers(HttpMethod.PUT, "/user")
-                                                .hasRole(UserRoleType.PREUSER.name())
-                                                .requestMatchers(HttpMethod.DELETE, "/user")
-                                                .hasRole(UserRoleType.PREUSER.name())
-                                                .requestMatchers("/admin/**")
-                                                .hasRole(UserRoleType.ADMIN.name())
-                                                .anyRequest()
-                                                .authenticated());
+        // 인가
+        http.authorizeHttpRequests(
+                auth ->
+                        auth.requestMatchers(
+                                        "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
+                                .permitAll() // Swagger UI : 전체 허용
+                                .requestMatchers("/jwt/exchange", "/jwt/refresh")
+                                .permitAll() // JWT 발급 경로 : 전체 허용
+                                .requestMatchers("/test/preuser-only")
+                                .hasRole(UserRoleType.PREUSER.name()) // PREUSER 권한 테스트
+                                .requestMatchers("/test")
+                                .permitAll() // 테스트용 토큰 발급 경로 : 전체 허용
+                                .requestMatchers(HttpMethod.POST, "/user/exist", "/user")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/user")
+                                .hasRole(UserRoleType.PREUSER.name())
+                                .requestMatchers(HttpMethod.PUT, "/user")
+                                .hasRole(UserRoleType.PREUSER.name())
+                                .requestMatchers(HttpMethod.DELETE, "/user")
+                                .hasRole(UserRoleType.PREUSER.name())
+                                .requestMatchers("/admin/**")
+                                .hasRole(UserRoleType.ADMIN.name())
+                                .anyRequest()
+                                .authenticated());
 
-                // 예외 처리
-                http.exceptionHandling(
-                                e -> e.authenticationEntryPoint(authenticationEntryPoint)
-                                                .accessDeniedHandler(accessDeniedHandler));
+        // 예외 처리
+        http.exceptionHandling(
+                e ->
+                        e.authenticationEntryPoint(authenticationEntryPoint)
+                                .accessDeniedHandler(accessDeniedHandler));
 
-                // 커스텀 필터 추가 (로그아웃 필터 앞에 넣음)
-                http.addFilterBefore(new JwtFilter(), LogoutFilter.class);
+        // 커스텀 필터 추가 (로그아웃 필터 앞에 넣음)
+        http.addFilterBefore(new JwtFilter(), LogoutFilter.class);
 
-                // 세션 필터 설정 (STATELESS)
-                http.sessionManagement(
-                                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // 세션 필터 설정 (STATELESS)
+        http.sessionManagement(
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                return http.build();
-        }
+        return http.build();
+    }
 }

@@ -14,6 +14,7 @@ import com.example.ssccwebbe.global.apipayload.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "관리자용 지원서 API", description = "지원서 통계 및 전체 조회를 위한 관리자 전용 API")
