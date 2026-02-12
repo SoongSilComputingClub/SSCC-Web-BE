@@ -7,8 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.domain.admin.dto.CodingExpDistributionResponse;
 import com.example.ssccwebbe.domain.admin.dto.GenderDistributionResponse;
+import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
+import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class ApplyFormAdminService {
 
     private final ApplyFormRepository applyFormRepository;
+    private final ApplyFormInterviewTimeRepository interviewTimeRepository;
 
     public GenderDistributionResponse getGenderDistribution() {
         long maleCount = applyFormRepository.countByGenderAndStatusNot("남", ApplyFormStatus.DELETED);
@@ -57,5 +61,40 @@ public class ApplyFormAdminService {
                 .totalCount(totalCount)
                 .distributions(distributions)
                 .build();
+    }
+
+    public List<ApplyFormReadResponse> getAllApplications() {
+        return applyFormRepository.findAllByStatusNot(ApplyFormStatus.DELETED).stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private ApplyFormReadResponse toResponse(ApplyFormEntity form) {
+        List<ApplyFormReadResponse.InterviewTime> times = interviewTimeRepository
+                .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)
+                .stream()
+                .map(
+                        t -> new ApplyFormReadResponse.InterviewTime(
+                                t.getInterviewDate(),
+                                t.getStartTime(),
+                                t.getEndTime()))
+                .toList();
+
+        return new ApplyFormReadResponse(
+                form.getId(),
+                form.getPreUser().getUsername(),
+                form.getApplicantName(),
+                form.getDepartment(),
+                form.getStudentNo(),
+                form.getGrade(),
+                form.getPhone(),
+                form.getGender(),
+                form.getIntroduce(),
+                form.getCodingExp(),
+                form.getTechStackText(),
+                form.getWantedValue(),
+                form.getAspiration(),
+                form.getStatus(),
+                times);
     }
 }

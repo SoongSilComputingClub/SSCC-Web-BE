@@ -1,5 +1,7 @@
 package com.example.ssccwebbe.domain.admin.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ssccwebbe.domain.admin.dto.CodingExpDistributionResponse;
 import com.example.ssccwebbe.domain.admin.dto.GenderDistributionResponse;
 import com.example.ssccwebbe.domain.admin.service.ApplyFormAdminService;
+import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
 import com.example.ssccwebbe.global.apipayload.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -26,5 +29,10 @@ public class ApplyFormAdminController {
     @GetMapping("/coding-exp-distribution")
     public ApiResponse<CodingExpDistributionResponse> getCodingExpDistribution() {
         return ApiResponse.success(applyFormAdminService.getCodingExpDistribution());
+    }
+
+    @GetMapping
+    public ApiResponse<List<ApplyFormReadResponse>> getAllApplications() {
+        return ApiResponse.success(applyFormAdminService.getAllApplications());
     }
 }
