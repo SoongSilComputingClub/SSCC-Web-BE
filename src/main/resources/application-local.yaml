@@ -39,10 +39,10 @@ refresh-token:
 
 # Frontend Configuration
 frontend:
-  url: http://localhost:5173
+  url: http://localhost:3000
   cookie:
     secure: false
-    same-site: none
+    same-site: lax
     http-only: true
 
 logging:
