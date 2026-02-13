@@ -43,7 +43,7 @@ public class SecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
-    //  LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
+    // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
     public SecurityConfig(
             @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
             @Qualifier("SocialFailureHandler") AuthenticationFailureHandler socialFailureHandler,
@@ -134,6 +134,8 @@ public class SecurityConfig {
                                 .hasRole(UserRoleType.PREUSER.name())
                                 .requestMatchers(HttpMethod.DELETE, "/user")
                                 .hasRole(UserRoleType.PREUSER.name())
+                                .requestMatchers("/admin/**")
+                                .hasRole(UserRoleType.ADMIN.name())
                                 .anyRequest()
                                 .authenticated());
 
