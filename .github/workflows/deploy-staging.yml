@@ -220,11 +220,15 @@ jobs:
           )
 
           # Send bulk update request
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
             -X PATCH "$COOLIFY_URL/api/v1/applications/$COOLIFY_SERVICE_ID/envs/bulk" \
             -H "Authorization: Bearer $COOLIFY_TOKEN" \
             -H "Content-Type: application/json" \
             -d "$ENV_DATA")
+
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -1)
+          RESPONSE_BODY=$(echo "$RESPONSE" | head -n -1)
+          echo "Response body: $RESPONSE_BODY"
 
           if [ "$HTTP_STATUS" -ne 201 ]; then
             echo "::error::Failed to update environment variables (HTTP $HTTP_STATUS)"
