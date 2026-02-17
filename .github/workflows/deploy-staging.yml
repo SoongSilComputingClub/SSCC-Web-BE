@@ -1,44 +1,44 @@
 # ============================================================================
-# Backend Deploy Workflow (Coolify + GHCR)
+# Backend Deploy Workflow - Staging (Coolify + GHCR)
 # ============================================================================
 # 역할:
-#   - Integrate workflow 성공 후 자동 실행
-#   - integrate에서 생성된 JAR artifact 사용 (빌드 재수행 없음)
-#   - Docker 이미지 빌드 및 GHCR 푸시
-#   - Coolify webhook으로 배포 트리거 (Coolify가 GHCR에서 이미지 pull)
+#   - Integrate Staging workflow 성공 후 자동 실행
+#   - integrate-staging에서 생성된 JAR artifact 사용 (빌드 재수행 없음)
+#   - Docker 이미지 빌드 및 GHCR 푸시 (태그: :staging)
+#   - Coolify webhook으로 staging 서버 배포 트리거
 #
 # Job 구조:
 #   prepare ──> build-image ──> deploy
 #
 # 트리거:
-#   - Integrate Backend workflow가 develop 브랜치에서 성공적으로 완료된 후
-#   - 수동 실행 (workflow_dispatch) - 최근 성공한 integrate run의 artifact 사용
+#   - Integrate Staging workflow가 develop 브랜치에서 성공적으로 완료된 후
+#   - 수동 실행 (workflow_dispatch) - 최근 성공한 integrate-staging run의 artifact 사용
 #
-# GitHub Secrets (Settings > Secrets and variables > Actions > Secrets):
-#   - COOLIFY_WEBHOOK     : Coolify 배포 webhook URL
-#   - COOLIFY_TOKEN   : Coolify API Token (환경변수 주입 + webhook 인증)
-#   - COOLIFY_URL         : Coolify 서버 URL (e.g., https://coolify.example.com)
-#   - COOLIFY_SERVICE_ID  : Coolify 애플리케이션 서비스 UUID
-#   - SPRING_PROFILE      : Spring 프로필 (예: prod, local, test)
-#   - DATABASE_URL        : Spring Datasource URL (jdbc:mysql://...)
-#   - DATABASE_USER       : DB 사용자명
-#   - DATABASE_PASSWORD   : DB 비밀번호
-#   - JWT_SECRET_KEY      : JWT 서명 키
-#   - JWT_ACCESS_TOKEN_EXPIRES_IN : JWT Access Token 만료 시간 (ms, 기본: 3600000)
-#   - JWT_REFRESH_TOKEN_EXPIRES_IN : JWT Refresh Token 만료 시간 (ms, 기본: 604800000)
-#   - GOOGLE_CLIENT_NAME  : Google OAuth2 클라이언트 이름
-#   - GOOGLE_CLIENT_ID    : Google OAuth2 클라이언트 ID
-#   - GOOGLE_CLIENT_SECRET : Google OAuth2 클라이언트 시크릿
-#   - GOOGLE_REDIRECT_URI : Google OAuth2 리디렉션 URI
-#   - FRONTEND_URL        : 프론트엔드 URL (선택, 기본: http://localhost:5173)
-#   - OTEL_EXPORTER_OTLP_ENDPOINT : OpenTelemetry 수집 엔드포인트 (선택)
+# GitHub Environment: staging
+#   (Settings > Environments > staging 에 아래 시크릿 등록)
+#   - STAGING_COOLIFY_WEBHOOK      : Staging Coolify 배포 webhook URL
+#   - STAGING_COOLIFY_TOKEN        : Staging Coolify API Token
+#   - STAGING_COOLIFY_URL          : Staging Coolify 서버 URL
+#   - STAGING_COOLIFY_SERVICE_ID   : Staging Coolify 애플리케이션 서비스 UUID
+#   - SPRING_PROFILES_ACTIVE        : staging
+#   - STAGING_DATABASE_URL         : Staging DB URL (jdbc:mysql://...)
+#   - STAGING_DATABASE_USER        : Staging DB 사용자명
+#   - STAGING_DATABASE_PASSWORD    : Staging DB 비밀번호
+#   - STAGING_JWT_SECRET_KEY       : JWT 서명 키
+#   - STAGING_JWT_ACCESS_TOKEN_EXPIRES_IN  : JWT Access Token 만료 시간 (ms)
+#   - STAGING_JWT_REFRESH_TOKEN_EXPIRES_IN : JWT Refresh Token 만료 시간 (ms)
+#   - STAGING_GOOGLE_CLIENT_NAME   : Google OAuth2 클라이언트 이름
+#   - STAGING_GOOGLE_CLIENT_ID     : Google OAuth2 클라이언트 ID
+#   - STAGING_GOOGLE_CLIENT_SECRET : Google OAuth2 클라이언트 시크릿
+#   - STAGING_GOOGLE_REDIRECT_URI  : Google OAuth2 리디렉션 URI
+#   - STAGING_FRONTEND_URL         : 프론트엔드 URL
 # ============================================================================
 
-name: Deploy Backend to Coolify
+name: Deploy Backend to Staging
 
 on:
   workflow_run:
-    workflows: ["Integrate Backend"]
+    workflows: ["Integrate Staging"]
     types:
       - completed
     branches:
@@ -165,7 +165,7 @@ jobs:
           push: true
           tags: |
             ${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.head_sha }}
-            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:staging
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -178,44 +178,43 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     needs: [prepare, build-image]
+    environment: staging
 
     steps:
       - name: Update Coolify environment variables
         env:
-          COOLIFY_URL: ${{ secrets.COOLIFY_URL }}
-          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
-          COOLIFY_SERVICE_ID: ${{ secrets.COOLIFY_SERVICE_ID }}
+          COOLIFY_URL: ${{ secrets.STAGING_COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.STAGING_COOLIFY_TOKEN }}
+          COOLIFY_SERVICE_ID: ${{ secrets.STAGING_COOLIFY_SERVICE_ID }}
         run: |
           # Build JSON array of all environment variables
           ENV_DATA=$(jq -n \
-            --arg spring_profile "${{ secrets.SPRING_PROFILE }}" \
-            --arg db_url "${{ secrets.DATABASE_URL }}" \
-            --arg db_user "${{ secrets.DATABASE_USER }}" \
-            --arg db_pass "${{ secrets.DATABASE_PASSWORD }}" \
-            --arg jwt_secret "${{ secrets.JWT_SECRET_KEY }}" \
-            --arg jwt_access_ttl "${{ secrets.JWT_ACCESS_TOKEN_EXPIRES_IN }}" \
-            --arg jwt_refresh_ttl "${{ secrets.JWT_REFRESH_TOKEN_EXPIRES_IN }}" \
-            --arg google_name "${{ secrets.GOOGLE_CLIENT_NAME }}" \
-            --arg google_id "${{ secrets.GOOGLE_CLIENT_ID }}" \
-            --arg google_secret "${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-            --arg google_redirect "${{ secrets.GOOGLE_REDIRECT_URI }}" \
-            --arg frontend_url "${{ secrets.FRONTEND_URL }}" \
-            --arg otel_endpoint "${{ secrets.OTEL_EXPORTER_OTLP_ENDPOINT }}" \
+            --arg spring_profile "${{ secrets.SPRING_PROFILES_ACTIVE }}" \
+            --arg db_url "${{ secrets.STAGING_DATABASE_URL }}" \
+            --arg db_user "${{ secrets.STAGING_DATABASE_USER }}" \
+            --arg db_pass "${{ secrets.STAGING_DATABASE_PASSWORD }}" \
+            --arg jwt_secret "${{ secrets.STAGING_JWT_SECRET_KEY }}" \
+            --arg jwt_access_ttl "${{ secrets.STAGING_JWT_ACCESS_TOKEN_EXPIRES_IN }}" \
+            --arg jwt_refresh_ttl "${{ secrets.STAGING_JWT_REFRESH_TOKEN_EXPIRES_IN }}" \
+            --arg google_name "${{ secrets.STAGING_GOOGLE_CLIENT_NAME }}" \
+            --arg google_id "${{ secrets.STAGING_GOOGLE_CLIENT_ID }}" \
+            --arg google_secret "${{ secrets.STAGING_GOOGLE_CLIENT_SECRET }}" \
+            --arg google_redirect "${{ secrets.STAGING_GOOGLE_REDIRECT_URI }}" \
+            --arg frontend_url "${{ secrets.STAGING_FRONTEND_URL }}" \
             '{
               data: [
                 {key: "SPRING_PROFILES_ACTIVE", value: $spring_profile, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "DATABASE_URL", value: $db_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "DATABASE_USER", value: $db_user, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "DATABASE_PASSWORD", value: $db_pass, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "JWT_SECRET_KEY", value: $jwt_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "JWT_ACCESS_TOKEN_EXPIRES_IN", value: $jwt_access_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "JWT_REFRESH_TOKEN_EXPIRES_IN", value: $jwt_refresh_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "GOOGLE_CLIENT_NAME", value: $google_name, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "GOOGLE_CLIENT_ID", value: $google_id, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "GOOGLE_CLIENT_SECRET", value: $google_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "GOOGLE_REDIRECT_URI", value: $google_redirect, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "FRONTEND_URL", value: $frontend_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
-                {key: "OTEL_EXPORTER_OTLP_ENDPOINT", value: $otel_endpoint, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false}
+                {key: "STAGING_DATABASE_URL", value: $db_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_DATABASE_USER", value: $db_user, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_DATABASE_PASSWORD", value: $db_pass, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_JWT_SECRET_KEY", value: $jwt_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_JWT_ACCESS_TOKEN_EXPIRES_IN", value: $jwt_access_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_JWT_REFRESH_TOKEN_EXPIRES_IN", value: $jwt_refresh_ttl, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_GOOGLE_CLIENT_NAME", value: $google_name, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_GOOGLE_CLIENT_ID", value: $google_id, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_GOOGLE_CLIENT_SECRET", value: $google_secret, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_GOOGLE_REDIRECT_URI", value: $google_redirect, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false},
+                {key: "STAGING_FRONTEND_URL", value: $frontend_url, is_preview: false, is_literal: false, is_multiline: false, is_shown_once: false}
               ]
             }'
           )
@@ -236,8 +235,8 @@ jobs:
       - name: Deploy to Coolify via webhook
         run: |
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            --request GET '${{ secrets.COOLIFY_WEBHOOK }}' \
-            --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}')
+            --request GET '${{ secrets.STAGING_COOLIFY_WEBHOOK }}' \
+            --header 'Authorization: Bearer ${{ secrets.STAGING_COOLIFY_TOKEN }}')
 
           if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
             echo "::error::Coolify deployment failed with HTTP $HTTP_STATUS"
@@ -247,9 +246,11 @@ jobs:
 
       - name: Deployment Summary
         run: |
-          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image**: \`${{ env.IMAGE_NAME }}:${{ needs.prepare.outputs.head_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary (Staging)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: staging" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image**: \`${{ env.IMAGE_NAME }}:staging\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit SHA**: \`${{ needs.prepare.outputs.head_sha }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Source Run ID**: ${{ needs.prepare.outputs.run_id }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Registry**: GHCR (ghcr.io)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Deploy Target**: Coolify" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy Target**: Coolify (Staging)" >> $GITHUB_STEP_SUMMARY
           echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY

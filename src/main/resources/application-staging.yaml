@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: ${DATABASE_URL}
+    url: ${STAGING_DATABASE_URL}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DATABASE_USER}
-    password: ${DATABASE_PASSWORD}
+    username: ${STAGING_DATABASE_USER}
+    password: ${STAGING_DATABASE_PASSWORD}
 
   jpa:
     hibernate:
@@ -20,10 +20,10 @@ spring:
         registration:
           # Google registration
           google:
-            client-name: ${GOOGLE_CLIENT_NAME}
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: ${GOOGLE_REDIRECT_URI}
+            client-name: ${STAGING_GOOGLE_CLIENT_NAME}
+            client-id: ${STAGING_GOOGLE_CLIENT_ID}
+            client-secret: ${STAGING_GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${STAGING_GOOGLE_REDIRECT_URI}
             authorization-grant-type: authorization_code
             scope:
               - profile
@@ -31,13 +31,13 @@ spring:
 
 # JWT Configuration (production uses environment variables)
 jwt:
-  secret-key: ${JWT_SECRET_KEY}
-  access-token-expires-in: ${JWT_ACCESS_TOKEN_EXPIRES_IN}
-  refresh-token-expires-in: ${JWT_REFRESH_TOKEN_EXPIRES_IN}
+  secret-key: ${STAGING_JWT_SECRET_KEY}
+  access-token-expires-in: ${STAGING_JWT_ACCESS_TOKEN_EXPIRES_IN}
+  refresh-token-expires-in: ${STAGING_JWT_REFRESH_TOKEN_EXPIRES_IN}
 
 # Frontend Configuration
 frontend:
-  url: ${FRONTEND_URL}
+  url: ${STAGING_FRONTEND_URL}
   cookie:
     same-site: none
     secure: true
