@@ -79,7 +79,7 @@ jobs:
 
             # 최근 성공한 Integrate Backend workflow run 조회
             RUN_INFO=$(gh run list \
-              --workflow "Integrate Backend" \
+              --workflow "Integrate Staging" \
               --branch develop \
               --status success \
               --event push \
