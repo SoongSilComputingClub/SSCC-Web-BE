@@ -155,7 +155,7 @@ public class ApplyFormService {
         interviewTimeRepository.saveAll(entities);
     }
 
-    private ApplyFormReadResponse toResponse(UserEntity User, ApplyFormEntity form) {
+    private ApplyFormReadResponse toResponse(UserEntity user, ApplyFormEntity form) {
         List<ApplyFormReadResponse.InterviewTime> times =
                 interviewTimeRepository
                         .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)
@@ -170,7 +170,7 @@ public class ApplyFormService {
 
         return new ApplyFormReadResponse(
                 form.getId(),
-                User.getUsername(),
+                user.getUsername(),
                 form.getApplicantName(),
                 form.getDepartment(),
                 form.getStudentNo(),

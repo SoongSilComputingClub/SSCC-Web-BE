@@ -35,8 +35,7 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "apply_form_entity",
-        uniqueConstraints =
-                @UniqueConstraint(name = "uk_apply_form_user", columnNames = "user_id"))
+        uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_user", columnNames = "user_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -97,8 +96,7 @@ public class ApplyFormEntity {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    public static ApplyFormEntity create(
-            UserEntity user, ApplyFormCreateOrUpdateRequest req) {
+    public static ApplyFormEntity create(UserEntity user, ApplyFormCreateOrUpdateRequest req) {
         return new ApplyFormEntity(
                 null,
                 user,

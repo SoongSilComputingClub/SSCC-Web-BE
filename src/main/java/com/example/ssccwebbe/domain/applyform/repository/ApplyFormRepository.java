@@ -14,9 +14,9 @@ import com.example.ssccwebbe.domain.user.entity.UserEntity;
 // -> 조회 이유는 이미 작성한 지원서가 있으면 그거 내용을 그대로 불러와서 적용시키기 위함
 
 public interface ApplyFormRepository extends JpaRepository<ApplyFormEntity, Long> {
-    Optional<ApplyFormEntity> findByUser(UserEntity User);
+    Optional<ApplyFormEntity> findByUser(UserEntity user);
 
-    boolean existsByUser(UserEntity User);
+    boolean existsByUser(UserEntity user);
 
     long countByGenderAndStatusNot(String gender, ApplyFormStatus status);
 

@@ -19,8 +19,8 @@ import com.example.ssccwebbe.domain.user.code.UserErrorCode;
 import com.example.ssccwebbe.domain.user.dto.CustomOAuth2User;
 import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
-import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
@@ -71,8 +71,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
         }
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
-        Optional<UserEntity> entity =
-                userRepository.findByUsernameAndIsSocial(username, true);
+        Optional<UserEntity> entity = userRepository.findByUsernameAndIsSocial(username, true);
 
         // 기존 회원인 경우
         if (entity.isPresent()) {
