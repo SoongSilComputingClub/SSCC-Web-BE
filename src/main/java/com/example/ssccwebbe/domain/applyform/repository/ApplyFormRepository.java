@@ -10,13 +10,13 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
 
-// PreUser 기준으로 본인의 지원서 1개를 조회하는 메서드를 제공
+// User 기준으로 본인의 지원서 1개를 조회하는 메서드를 제공
 // -> 조회 이유는 이미 작성한 지원서가 있으면 그거 내용을 그대로 불러와서 적용시키기 위함
 
 public interface ApplyFormRepository extends JpaRepository<ApplyFormEntity, Long> {
-    Optional<ApplyFormEntity> findByPreUser(UserEntity preUser);
+    Optional<ApplyFormEntity> findByUser(UserEntity User);
 
-    boolean existsByPreUser(UserEntity preUser);
+    boolean existsByUser(UserEntity User);
 
     long countByGenderAndStatusNot(String gender, ApplyFormStatus status);
 
