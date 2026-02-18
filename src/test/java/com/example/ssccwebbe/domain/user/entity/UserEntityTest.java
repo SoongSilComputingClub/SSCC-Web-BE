@@ -14,7 +14,7 @@ import com.example.ssccwebbe.global.security.UserRoleType;
 
 @DataJpaTest
 @ActiveProfiles("test")
-class PreUserEntityTest {
+class UserEntityTest {
 
     @Autowired private TestEntityManager entityManager;
 
@@ -22,8 +22,8 @@ class PreUserEntityTest {
     @DisplayName("Builder를 사용하여 PreUserEntity를 생성할 수 있다")
     void builder_CreatesEntity_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("testuser@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -48,8 +48,8 @@ class PreUserEntityTest {
     @DisplayName("소셜 로그인 사용자 엔티티를 생성할 수 있다")
     void builder_CreatesSocialUser_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("GOOGLE_123456789")
                         .isLock(false)
                         .isSocial(true)
@@ -71,8 +71,8 @@ class PreUserEntityTest {
     @DisplayName("updateUser를 호출하면 email과 nickname이 업데이트된다")
     void updateUser_UpdatesEmailAndNickname() {
         // given
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("user@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -100,8 +100,8 @@ class PreUserEntityTest {
         String originalUsername = "user@test.com";
         UserRoleType originalRole = UserRoleType.USER;
 
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username(originalUsername)
                         .isLock(false)
                         .isSocial(false)
@@ -127,8 +127,8 @@ class PreUserEntityTest {
     @DisplayName("엔티티를 저장하고 조회할 수 있다")
     void save_AndFind_Success() {
         // given
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("savetest@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -138,9 +138,9 @@ class PreUserEntityTest {
                         .build();
 
         // when
-        PreUserEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserEntity savedEntity = entityManager.persistAndFlush(entity);
         entityManager.clear(); // 캐시 클리어
-        PreUserEntity foundEntity = entityManager.find(PreUserEntity.class, savedEntity.getId());
+        UserEntity foundEntity = entityManager.find(UserEntity.class, savedEntity.getId());
 
         // then
         assertThat(foundEntity).isNotNull();
@@ -153,8 +153,8 @@ class PreUserEntityTest {
     @DisplayName("엔티티를 수정하고 다시 저장할 수 있다")
     void update_AndSave_Success() {
         // given
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("updatetest@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -163,22 +163,22 @@ class PreUserEntityTest {
                         .email("updatetest@test.com")
                         .build();
 
-        PreUserEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserEntity savedEntity = entityManager.persistAndFlush(entity);
         entityManager.clear();
 
         // when
-        PreUserEntity foundEntity = entityManager.find(PreUserEntity.class, savedEntity.getId());
+        UserEntity foundEntity = entityManager.find(UserEntity.class, savedEntity.getId());
 
         UserRequestDto dto = new UserRequestDto();
         dto.setEmail("updated@test.com");
         dto.setNickname("Updated Nickname");
 
         foundEntity.updateUser(dto);
-        PreUserEntity updatedEntity = entityManager.persistAndFlush(foundEntity);
+        UserEntity updatedEntity = entityManager.persistAndFlush(foundEntity);
         entityManager.clear();
 
-        PreUserEntity reFoundEntity =
-                entityManager.find(PreUserEntity.class, updatedEntity.getId());
+        UserEntity reFoundEntity =
+                entityManager.find(UserEntity.class, updatedEntity.getId());
 
         // then
         assertThat(reFoundEntity.getEmail()).isEqualTo("updated@test.com");
@@ -189,8 +189,8 @@ class PreUserEntityTest {
     @DisplayName("ADMIN 권한 사용자를 생성할 수 있다")
     void builder_CreatesAdminUser_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("admin@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -207,8 +207,8 @@ class PreUserEntityTest {
     @DisplayName("계정 잠김 상태의 사용자를 생성할 수 있다")
     void builder_CreatesLockedUser_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("locked@test.com")
                         .isLock(true)
                         .isSocial(false)
@@ -225,8 +225,8 @@ class PreUserEntityTest {
     @DisplayName("합격 정보를 포함한 사용자를 생성할 수 있다")
     void builder_CreatesAcceptedUser_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("accepted@test.com")
                         .isLock(false)
                         .isSocial(false)
@@ -244,8 +244,8 @@ class PreUserEntityTest {
     @DisplayName("socialProviderType이 null인 일반 사용자를 생성할 수 있다")
     void builder_CreatesUserWithNullSocialProvider_Success() {
         // given & when
-        PreUserEntity entity =
-                PreUserEntity.builder()
+        UserEntity entity =
+                UserEntity.builder()
                         .username("regular@test.com")
                         .isLock(false)
                         .isSocial(false)

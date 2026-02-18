@@ -4,11 +4,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 
-public interface PreUserRepository extends JpaRepository<PreUserEntity, Long> {
+public interface PreUserRepository extends JpaRepository<UserEntity, Long> {
 
-    Optional<PreUserEntity> findByUsernameAndIsSocial(String username, Boolean social);
+    Optional<UserEntity> findByUsernameAndIsSocial(String username, Boolean social);
 
-    Optional<PreUserEntity> findByUsernameAndIsLock(String username, Boolean isLock);
+    Optional<UserEntity> findByUsernameAndIsLock(String username, Boolean isLock);
 }

@@ -21,7 +21,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.ssccwebbe.domain.applyform.dto.ApplyFormCreateOrUpdateRequest;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -49,7 +49,7 @@ public class ApplyFormEntity {
     // PreUser 1명당 지원서 1개
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "preuser_id", nullable = false, updatable = false)
-    private PreUserEntity preUser;
+    private UserEntity preUser;
 
     @Column(name = "applicant_name", nullable = false)
     private String applicantName;
@@ -98,7 +98,7 @@ public class ApplyFormEntity {
     private LocalDateTime updatedDate;
 
     public static ApplyFormEntity create(
-            PreUserEntity preUser, ApplyFormCreateOrUpdateRequest req) {
+            UserEntity preUser, ApplyFormCreateOrUpdateRequest req) {
         return new ApplyFormEntity(
                 null,
                 preUser,

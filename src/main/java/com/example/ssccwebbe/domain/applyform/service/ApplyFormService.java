@@ -14,7 +14,7 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
@@ -31,7 +31,7 @@ public class ApplyFormService {
     // 지원서 조회용
     @Transactional(readOnly = true)
     public ApplyFormReadResponse read() {
-        PreUserEntity preUser = currentPreUser();
+        UserEntity preUser = currentPreUser();
         ApplyFormEntity form =
                 applyFormRepository
                         .findByPreUser(preUser)
@@ -49,7 +49,7 @@ public class ApplyFormService {
     public ApplyFormReadResponse create(ApplyFormCreateOrUpdateRequest req) {
         validate(req);
 
-        PreUserEntity preUser = currentPreUser();
+        UserEntity preUser = currentPreUser();
 
         return applyFormRepository
                 .findByPreUser(preUser)
@@ -83,7 +83,7 @@ public class ApplyFormService {
     public ApplyFormReadResponse update(ApplyFormCreateOrUpdateRequest req) {
         validate(req);
 
-        PreUserEntity preUser = currentPreUser();
+        UserEntity preUser = currentPreUser();
         ApplyFormEntity form =
                 applyFormRepository
                         .findByPreUser(preUser)
@@ -103,7 +103,7 @@ public class ApplyFormService {
     // 지원서 삭제
     @Transactional
     public void deleteSoft() {
-        PreUserEntity preUser = currentPreUser();
+        UserEntity preUser = currentPreUser();
         ApplyFormEntity form =
                 applyFormRepository
                         .findByPreUser(preUser)
@@ -122,7 +122,7 @@ public class ApplyFormService {
     // ------------------ private ------------------
 
     // 현재 로그인한 사용자를 pre_user_entity에서 조회
-    private PreUserEntity currentPreUser() {
+    private UserEntity currentPreUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return preUserRepository
@@ -155,7 +155,7 @@ public class ApplyFormService {
         interviewTimeRepository.saveAll(entities);
     }
 
-    private ApplyFormReadResponse toResponse(PreUserEntity preUser, ApplyFormEntity form) {
+    private ApplyFormReadResponse toResponse(UserEntity preUser, ApplyFormEntity form) {
         List<ApplyFormReadResponse.InterviewTime> times =
                 interviewTimeRepository
                         .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)

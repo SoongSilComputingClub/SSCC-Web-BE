@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
@@ -25,15 +25,15 @@ public class TestService {
     public TestTokenResponseDto createOrGetTokens(String username) {
 
         // 1. 유저 조회 (isSocial=false인 유저)
-        Optional<PreUserEntity> existingUser =
+        Optional<UserEntity> existingUser =
                 preUserRepository.findByUsernameAndIsSocial(username, false);
 
-        PreUserEntity user;
+        UserEntity user;
 
         // 2. 없으면 새로 생성
         if (existingUser.isEmpty()) {
             user =
-                    PreUserEntity.builder()
+                    UserEntity.builder()
                             .username(username)
                             .email(username + "@test.com")
                             .nickname(username)

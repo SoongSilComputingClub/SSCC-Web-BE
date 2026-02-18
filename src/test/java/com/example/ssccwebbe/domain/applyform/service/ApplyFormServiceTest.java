@@ -30,7 +30,7 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
@@ -46,12 +46,12 @@ class ApplyFormServiceTest {
     @InjectMocks private ApplyFormService applyFormService;
 
     private String username = "testuser";
-    private PreUserEntity preUser;
+    private UserEntity preUser;
     private ApplyFormCreateOrUpdateRequest request;
 
     @BeforeEach
     void setUp() {
-        preUser = PreUserEntity.builder().username(username).isLock(false).build();
+        preUser = UserEntity.builder().username(username).isLock(false).build();
 
         request =
                 new ApplyFormCreateOrUpdateRequest(

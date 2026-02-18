@@ -19,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.ssccwebbe.domain.user.code.UserErrorCode;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
@@ -44,8 +44,8 @@ class PreUserServiceImplTest {
         String email = "testuser@test.com";
         String nickname = "Test User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -83,8 +83,8 @@ class PreUserServiceImplTest {
         String email = "socialuser@gmail.com";
         String nickname = "Social User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -170,8 +170,8 @@ class PreUserServiceImplTest {
         String email = "preuser@test.com";
         String nickname = "Pre User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -207,8 +207,8 @@ class PreUserServiceImplTest {
         String email = "admin@test.com";
         String nickname = "Admin User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)

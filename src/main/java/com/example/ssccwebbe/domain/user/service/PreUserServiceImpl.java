@@ -19,7 +19,7 @@ import com.example.ssccwebbe.domain.user.code.UserErrorCode;
 import com.example.ssccwebbe.domain.user.dto.CustomOAuth2User;
 import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
-import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
@@ -71,7 +71,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         }
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
-        Optional<PreUserEntity> entity =
+        Optional<UserEntity> entity =
                 preUserRepository.findByUsernameAndIsSocial(username, true);
 
         // 기존 회원인 경우
@@ -90,8 +90,8 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             // 신규 회원인 경우
         } else {
             // 신규 유저 추가
-            PreUserEntity newUserEntity =
-                    PreUserEntity.builder()
+            UserEntity newUserEntity =
+                    UserEntity.builder()
                             .username(username)
                             .isLock(false)
                             .isSocial(true)
@@ -119,7 +119,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
     public UserResponseDto readPreUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        PreUserEntity entity =
+        UserEntity entity =
                 preUserRepository
                         .findByUsernameAndIsLock(username, false)
                         .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));

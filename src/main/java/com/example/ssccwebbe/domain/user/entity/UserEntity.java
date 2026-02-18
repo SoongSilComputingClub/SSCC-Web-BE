@@ -26,12 +26,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class) // 생성일, 수정일 자동 변경
-@Table(name = "pre_user_entity")
+@Table(name = "user_entity")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreUserEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
