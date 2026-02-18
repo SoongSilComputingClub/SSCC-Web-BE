@@ -1,7 +1,6 @@
 package com.example.ssccwebbe.global.security.handler;
 
 import java.io.IOException;
-import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 
@@ -22,7 +20,7 @@ import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 @Qualifier("SocialSuccessHandler")
 public class SocialSuccessHandler implements AuthenticationSuccessHandler {
 
-    private final Map<UserRoleType, JwtService> jwtServiceMap;
+    private final JwtService jwtService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -36,14 +34,8 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
     @Value("${frontend.cookie.http-only}")
     private boolean cookieHttpOnly;
 
-    public SocialSuccessHandler(@Qualifier("preJwtService") JwtService preJwtService) {
-        // JWT Service 매핑 (Strategy 패턴)
-        this.jwtServiceMap =
-                Map.of(
-                        UserRoleType.PREUSER, preJwtService
-                        // UserRoleType.USER, userJwtService  // 나중에 추가
-                        // UserRoleType.ADMIN, adminJwtService  // 나중에 추가
-                        );
+    public SocialSuccessHandler(@Qualifier("JwtService") JwtService jwtService) {
+        this.jwtService = jwtService;
     }
 
     // 소셜 로그인 성공시 동작 메서드
@@ -55,12 +47,6 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
         // username, role
         String username = authentication.getName();
         String role = authentication.getAuthorities().iterator().next().getAuthority();
-
-        // UserRoleType 변환 및 JwtService 선택 (Strategy 패턴)
-        UserRoleType roleType = parseRoleType(role);
-        JwtService jwtService =
-                jwtServiceMap.getOrDefault(
-                        roleType, jwtServiceMap.get(UserRoleType.PREUSER)); // 기본값: PREUSER
 
         // JWT(Refresh) 발급 => 소셜 로그인의 경우 브라우저 리다이렉트 방식으로 토큰 발급이 쿠키 방식으로만 가능
         String refreshToken = JwtUtil.createJwt(username, role, false); // role에 이미 "ROLE_" 접두사 포함
@@ -80,15 +66,5 @@ public class SocialSuccessHandler implements AuthenticationSuccessHandler {
 
         response.addHeader("Set-Cookie", refreshCookie.toString());
         response.sendRedirect(frontendUrl + "/cookie"); // 프론트 주소로 redirect
-    }
-
-    /** "ROLE_PREUSER" -> UserRoleType.PREUSER 변환 */
-    private UserRoleType parseRoleType(String roleString) {
-        String role = roleString.replace("ROLE_", ""); // "ROLE_PREUSER" -> "PREUSER"
-        try {
-            return UserRoleType.valueOf(role); // "PREUSER" -> UserRoleType.PREUSER
-        } catch (IllegalArgumentException e) {
-            return UserRoleType.PREUSER; // 기본값
-        }
     }
 }

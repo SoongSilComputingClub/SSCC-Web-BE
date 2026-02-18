@@ -18,9 +18,9 @@ import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
 
 import lombok.RequiredArgsConstructor;
 
-@Service("preJwtService")
+@Service("JwtService")
 @RequiredArgsConstructor
-public class PreJwtServiceImpl implements JwtService {
+public class JwtServiceImpl implements JwtService {
 
     private final UserRefreshRepository userRefreshRepository;
 
