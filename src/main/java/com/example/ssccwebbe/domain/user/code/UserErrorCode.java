@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PreUserErrorCode implements ErrorCode {
+public enum UserErrorCode implements ErrorCode {
 
     // PreUser 관련 404 NOT_FOUND 에러
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "PREUSER4041", "해당 유저를 찾을 수 없습니다.");

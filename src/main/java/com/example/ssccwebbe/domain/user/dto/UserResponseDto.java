@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PreUserResponseDto {
+public class UserResponseDto {
     private String username;
     private Boolean social;
     private String nickname;

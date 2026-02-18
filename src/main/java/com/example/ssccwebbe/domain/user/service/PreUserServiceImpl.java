@@ -15,10 +15,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.user.code.PreUserErrorCode;
-import com.example.ssccwebbe.domain.user.dto.CustomOAuth2PreUser;
-import com.example.ssccwebbe.domain.user.dto.PreUserRequestDto;
-import com.example.ssccwebbe.domain.user.dto.PreUserResponseDto;
+import com.example.ssccwebbe.domain.user.code.UserErrorCode;
+import com.example.ssccwebbe.domain.user.dto.CustomOAuth2User;
+import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
+import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
 import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
@@ -80,7 +80,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             role = entity.get().getRoleType().name();
 
             // 기존 유저 업데이트
-            PreUserRequestDto dto = new PreUserRequestDto();
+            UserRequestDto dto = new UserRequestDto();
             dto.setNickname(nickname);
             dto.setEmail(email);
             entity.get().updateUser(dto);
@@ -111,20 +111,20 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             SocialSuccessHandler 에서 authentication.getName()을 호출했을 때
             (id가 아닌 ex. 12345) 우리가 원하는 형식 (social_id ex. NAVER_12345) 를 얻기 위해 CustomOAuth2User 를 리턴함
         */
-        return new CustomOAuth2PreUser(attributes, authorities, username);
+        return new CustomOAuth2User(attributes, authorities, username);
     }
 
     // 자체/소셜 유저 정보 조회
     @Transactional(readOnly = true)
-    public PreUserResponseDto readPreUser() {
+    public UserResponseDto readPreUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         PreUserEntity entity =
                 preUserRepository
                         .findByUsernameAndIsLock(username, false)
-                        .orElseThrow(() -> new GeneralException(PreUserErrorCode.USER_NOT_FOUND));
+                        .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
 
-        return new PreUserResponseDto(
+        return new UserResponseDto(
                 username, entity.getIsSocial(), entity.getNickname(), entity.getEmail());
     }
 }

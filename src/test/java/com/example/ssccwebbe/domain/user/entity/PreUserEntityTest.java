@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.example.ssccwebbe.domain.user.dto.PreUserRequestDto;
+import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @DataJpaTest
@@ -81,7 +81,7 @@ class PreUserEntityTest {
                         .email("old@test.com")
                         .build();
 
-        PreUserRequestDto dto = new PreUserRequestDto();
+        UserRequestDto dto = new UserRequestDto();
         dto.setEmail("new@test.com");
         dto.setNickname("New Nickname");
 
@@ -110,7 +110,7 @@ class PreUserEntityTest {
                         .email("old@test.com")
                         .build();
 
-        PreUserRequestDto dto = new PreUserRequestDto();
+        UserRequestDto dto = new UserRequestDto();
         dto.setEmail("new@test.com");
         dto.setNickname("New Nickname");
         dto.setUsername("hacker@test.com"); // DTO에 username이 있어도 무시됨
@@ -169,7 +169,7 @@ class PreUserEntityTest {
         // when
         PreUserEntity foundEntity = entityManager.find(PreUserEntity.class, savedEntity.getId());
 
-        PreUserRequestDto dto = new PreUserRequestDto();
+        UserRequestDto dto = new UserRequestDto();
         dto.setEmail("updated@test.com");
         dto.setNickname("Updated Nickname");
 

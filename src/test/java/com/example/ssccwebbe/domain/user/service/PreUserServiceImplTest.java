@@ -17,8 +17,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.example.ssccwebbe.domain.user.code.PreUserErrorCode;
-import com.example.ssccwebbe.domain.user.dto.PreUserResponseDto;
+import com.example.ssccwebbe.domain.user.code.UserErrorCode;
+import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
 import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
 import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
@@ -63,7 +63,7 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readPreUser();
 
         // then
         assertThat(result).isNotNull();
@@ -103,7 +103,7 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readPreUser();
 
         // then
         assertThat(result).isNotNull();
@@ -134,7 +134,7 @@ class PreUserServiceImplTest {
                 org.junit.jupiter.api.Assertions.assertThrows(
                         GeneralException.class, () -> preUserService.readPreUser());
 
-        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
@@ -158,7 +158,7 @@ class PreUserServiceImplTest {
                 org.junit.jupiter.api.Assertions.assertThrows(
                         GeneralException.class, () -> preUserService.readPreUser());
 
-        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
+        assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
@@ -189,7 +189,7 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readPreUser();
 
         // then
         assertThat(result).isNotNull();
@@ -226,7 +226,7 @@ class PreUserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readPreUser();
 
         // then
         assertThat(result).isNotNull();
