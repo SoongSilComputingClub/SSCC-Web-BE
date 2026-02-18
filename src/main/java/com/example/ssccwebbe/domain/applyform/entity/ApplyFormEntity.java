@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 @Table(
         name = "apply_form_entity",
         uniqueConstraints =
-                @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
+                @UniqueConstraint(name = "uk_apply_form_user", columnNames = "user_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,10 +46,10 @@ public class ApplyFormEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // PreUser 1명당 지원서 1개
+    // User 1명당 지원서 1개
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "preuser_id", nullable = false, updatable = false)
-    private UserEntity preUser;
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    private UserEntity user;
 
     @Column(name = "applicant_name", nullable = false)
     private String applicantName;
@@ -98,10 +98,10 @@ public class ApplyFormEntity {
     private LocalDateTime updatedDate;
 
     public static ApplyFormEntity create(
-            UserEntity preUser, ApplyFormCreateOrUpdateRequest req) {
+            UserEntity user, ApplyFormCreateOrUpdateRequest req) {
         return new ApplyFormEntity(
                 null,
-                preUser,
+                user,
                 req.applicantName(),
                 req.department(),
                 req.studentNo(),

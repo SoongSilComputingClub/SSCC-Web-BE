@@ -94,7 +94,7 @@ class ApplyFormAdminServiceTest {
         UserEntity preUser = UserEntity.builder().username("user1").build();
         ApplyFormEntity form = mock(ApplyFormEntity.class);
         when(form.getId()).thenReturn(1L);
-        when(form.getPreUser()).thenReturn(preUser);
+        when(form.getUser()).thenReturn(preUser);
         when(form.getApplicantName()).thenReturn("홍길동");
         when(form.getGender()).thenReturn("남");
         when(form.getStatus()).thenReturn(ApplyFormStatus.SUBMITTED);
