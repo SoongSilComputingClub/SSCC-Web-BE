@@ -34,10 +34,10 @@ class UserServiceImplTest {
 
     @Mock private Authentication authentication;
 
-    @InjectMocks private UserServiceImpl preUserService;
+    @InjectMocks private UserServiceImpl userService;
 
     @Test
-    @DisplayName("readPreUser - 일반 사용자 정보를 정상적으로 조회한다")
+    @DisplayName("readUser - 일반 사용자 정보를 정상적으로 조회한다")
     void readUser_RegularUser_Success() {
         // given
         String username = "testuser@test.com";
@@ -63,7 +63,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -76,7 +76,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("readPreUser - 소셜 로그인 사용자 정보를 정상적으로 조회한다")
+    @DisplayName("readUser - 소셜 로그인 사용자 정보를 정상적으로 조회한다")
     void readUser_SocialUser_Success() {
         // given
         String username = "GOOGLE_123456789";
@@ -103,7 +103,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -116,7 +116,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("readPreUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
+    @DisplayName("readUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
     void readUser_UserNotFound_ThrowsException() {
         // given
         String username = "nonexistent@test.com";
@@ -132,14 +132,14 @@ class UserServiceImplTest {
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readUser());
+                        GeneralException.class, () -> userService.readUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - 계정이 잠긴 사용자는 조회되지 않는다")
+    @DisplayName("readUser - 계정이 잠긴 사용자는 조회되지 않는다")
     void readUser_LockedUser_NotFound() {
         // given
         String username = "lockeduser@test.com";
@@ -156,15 +156,15 @@ class UserServiceImplTest {
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readUser());
+                        GeneralException.class, () -> userService.readUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - PREUSER 권한 사용자도 정상적으로 조회된다")
-    void readPreUser_UserRole_Success() {
+    @DisplayName("readUser - PREUSER 권한 사용자도 정상적으로 조회된다")
+    void readUser_UserRole_Success() {
         // given
         String username = "preuser@test.com";
         String email = "preuser@test.com";
@@ -189,7 +189,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -200,7 +200,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    @DisplayName("readPreUser - ADMIN 권한 사용자도 정상적으로 조회된다")
+    @DisplayName("readUser - ADMIN 권한 사용자도 정상적으로 조회된다")
     void readUser_AdminRole_Success() {
         // given
         String username = "admin@test.com";
@@ -226,7 +226,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();

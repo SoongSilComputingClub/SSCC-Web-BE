@@ -33,10 +33,9 @@ class UserRefreshRepositoryTest {
     private void updateCreatedDate(UserRefreshEntity entity, LocalDateTime createdDate) {
         entityManager
                 .createNativeQuery(
-                        "UPDATE pre_user_refresh_entity SET created_date = :createdDate WHERE id ="
-                                + " :id")
-                .setParameter("createdDate", createdDate)
-                .setParameter("id", entity.getId())
+                        "UPDATE user_refresh_entity SET created_date = ?1 WHERE id = ?2")
+                .setParameter(1, createdDate)
+                .setParameter(2, entity.getId())
                 .executeUpdate();
         entityManager.flush();
         entityManager.clear();

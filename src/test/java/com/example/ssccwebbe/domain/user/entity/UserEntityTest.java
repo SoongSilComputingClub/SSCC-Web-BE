@@ -19,7 +19,7 @@ class UserEntityTest {
     @Autowired private TestEntityManager entityManager;
 
     @Test
-    @DisplayName("Builder를 사용하여 PreUserEntity를 생성할 수 있다")
+    @DisplayName("Builder를 사용하여 UserEntity를 생성할 수 있다")
     void builder_CreatesEntity_Success() {
         // given & when
         UserEntity entity =

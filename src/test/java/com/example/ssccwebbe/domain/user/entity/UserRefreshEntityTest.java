@@ -16,7 +16,7 @@ class UserRefreshEntityTest {
     @Autowired private TestEntityManager entityManager;
 
     @Test
-    @DisplayName("Builder를 사용하여 PreUserRefreshEntity를 생성할 수 있다")
+    @DisplayName("Builder를 사용하여 UserRefreshEntity를 생성할 수 있다")
     void builder_CreatesEntity_Success() {
         // given & when
         UserRefreshEntity entity =
