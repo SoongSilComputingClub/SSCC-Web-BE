@@ -32,8 +32,7 @@ class UserRefreshRepositoryTest {
 
     private void updateCreatedDate(UserRefreshEntity entity, LocalDateTime createdDate) {
         entityManager
-                .createNativeQuery(
-                        "UPDATE user_refresh_entity SET created_date = ?1 WHERE id = ?2")
+                .createNativeQuery("UPDATE user_refresh_entity SET created_date = ?1 WHERE id = ?2")
                 .setParameter(1, createdDate)
                 .setParameter(2, entity.getId())
                 .executeUpdate();
@@ -47,10 +46,7 @@ class UserRefreshRepositoryTest {
         // given
         String refreshToken = "test-refresh-token-12345";
         UserRefreshEntity refreshEntity =
-                UserRefreshEntity.builder()
-                        .username("user@test.com")
-                        .refresh(refreshToken)
-                        .build();
+                UserRefreshEntity.builder().username("user@test.com").refresh(refreshToken).build();
         userRefreshRepository.save(refreshEntity);
 
         // when
@@ -161,10 +157,7 @@ class UserRefreshRepositoryTest {
         // given
         String refreshToken = "delete-test-token";
         UserRefreshEntity refreshEntity =
-                UserRefreshEntity.builder()
-                        .username("user@test.com")
-                        .refresh(refreshToken)
-                        .build();
+                UserRefreshEntity.builder().username("user@test.com").refresh(refreshToken).build();
         userRefreshRepository.save(refreshEntity);
 
         // when
@@ -503,10 +496,7 @@ class UserRefreshRepositoryTest {
         updateCreatedDate(oldRefresh2, oldTime);
 
         UserRefreshEntity newRefresh =
-                UserRefreshEntity.builder()
-                        .username("user3@test.com")
-                        .refresh("new-token")
-                        .build();
+                UserRefreshEntity.builder().username("user3@test.com").refresh("new-token").build();
 
         userRefreshRepository.save(newRefresh);
         userRefreshRepository.flush();
@@ -528,16 +518,10 @@ class UserRefreshRepositoryTest {
     void deleteByCreatedDateBefore_BeforeAllTokens_DeletesNothing() {
         // given
         UserRefreshEntity refresh1 =
-                UserRefreshEntity.builder()
-                        .username("user1@test.com")
-                        .refresh("token-1")
-                        .build();
+                UserRefreshEntity.builder().username("user1@test.com").refresh("token-1").build();
 
         UserRefreshEntity refresh2 =
-                UserRefreshEntity.builder()
-                        .username("user2@test.com")
-                        .refresh("token-2")
-                        .build();
+                UserRefreshEntity.builder().username("user2@test.com").refresh("token-2").build();
 
         userRefreshRepository.save(refresh1);
         userRefreshRepository.save(refresh2);
@@ -558,16 +542,10 @@ class UserRefreshRepositoryTest {
     void deleteByCreatedDateBefore_AfterAllTokens_DeletesAll() {
         // given
         UserRefreshEntity refresh1 =
-                UserRefreshEntity.builder()
-                        .username("user1@test.com")
-                        .refresh("token-1")
-                        .build();
+                UserRefreshEntity.builder().username("user1@test.com").refresh("token-1").build();
 
         UserRefreshEntity refresh2 =
-                UserRefreshEntity.builder()
-                        .username("user2@test.com")
-                        .refresh("token-2")
-                        .build();
+                UserRefreshEntity.builder().username("user2@test.com").refresh("token-2").build();
 
         userRefreshRepository.save(refresh1);
         userRefreshRepository.save(refresh2);

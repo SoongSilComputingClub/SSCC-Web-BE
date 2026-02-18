@@ -82,8 +82,7 @@ class ApplyFormServiceTest {
     void read_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(user, request);
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.of(form));
         when(interviewTimeRepository.findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form))
                 .thenReturn(
@@ -104,8 +103,7 @@ class ApplyFormServiceTest {
     @DisplayName("read - 지원서 없음 예외 발생")
     void read_NotFound() {
         // given
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.empty());
 
         // when & then
@@ -118,8 +116,7 @@ class ApplyFormServiceTest {
     @DisplayName("create - 신규 지원서 작성 성공")
     void create_Success() {
         // given
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.empty());
 
         ApplyFormEntity savedForm = ApplyFormEntity.create(user, request);
@@ -139,8 +136,7 @@ class ApplyFormServiceTest {
     void create_AlreadyExists() {
         // given
         ApplyFormEntity existingForm = ApplyFormEntity.create(user, request);
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.of(existingForm));
 
         // when & then
@@ -157,8 +153,7 @@ class ApplyFormServiceTest {
         ApplyFormEntity deletedForm = ApplyFormEntity.create(user, request);
         deletedForm.softDelete();
 
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.of(deletedForm));
 
         // when
@@ -175,8 +170,7 @@ class ApplyFormServiceTest {
     void update_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(user, request);
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.of(form));
 
         ApplyFormCreateOrUpdateRequest updateReq =
@@ -207,8 +201,7 @@ class ApplyFormServiceTest {
     void deleteSoft_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(user, request);
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.of(user));
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.of(user));
         when(applyFormRepository.findByUser(user)).thenReturn(Optional.of(form));
 
         // when
@@ -247,8 +240,7 @@ class ApplyFormServiceTest {
     @DisplayName("currentUser - 유저를 찾을 수 없는 경우 예외 발생")
     void currentUser_UserNotFound() {
         // given
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
 
         // when & then
         GeneralException exception =

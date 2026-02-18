@@ -163,8 +163,7 @@ class UserRefreshEntityTest {
         entityManager.clear();
 
         // then
-        UserRefreshEntity deletedEntity =
-                entityManager.find(UserRefreshEntity.class, savedId);
+        UserRefreshEntity deletedEntity = entityManager.find(UserRefreshEntity.class, savedId);
         assertThat(deletedEntity).isNull();
     }
 

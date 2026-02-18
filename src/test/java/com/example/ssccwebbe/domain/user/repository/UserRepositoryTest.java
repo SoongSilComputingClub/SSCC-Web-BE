@@ -12,8 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @SpringBootTest
@@ -47,8 +47,7 @@ class UserRepositoryTest {
         userRepository.save(socialUser);
 
         // when
-        Optional<UserEntity> result =
-                userRepository.findByUsernameAndIsSocial(username, true);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, true);
 
         // then
         assertThat(result).isPresent();
@@ -76,8 +75,7 @@ class UserRepositoryTest {
         userRepository.save(regularUser);
 
         // when
-        Optional<UserEntity> result =
-                userRepository.findByUsernameAndIsSocial(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isPresent();
@@ -174,8 +172,7 @@ class UserRepositoryTest {
         userRepository.save(socialUser);
 
         // when - isSocial이 false로 조회
-        Optional<UserEntity> result =
-                userRepository.findByUsernameAndIsSocial(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isEmpty();

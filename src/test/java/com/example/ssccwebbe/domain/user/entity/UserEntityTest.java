@@ -177,8 +177,7 @@ class UserEntityTest {
         UserEntity updatedEntity = entityManager.persistAndFlush(foundEntity);
         entityManager.clear();
 
-        UserEntity reFoundEntity =
-                entityManager.find(UserEntity.class, updatedEntity.getId());
+        UserEntity reFoundEntity = entityManager.find(UserEntity.class, updatedEntity.getId());
 
         // then
         assertThat(reFoundEntity.getEmail()).isEqualTo("updated@test.com");

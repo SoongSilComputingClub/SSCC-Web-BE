@@ -19,8 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.example.ssccwebbe.domain.user.code.UserErrorCode;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
-import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
@@ -126,8 +126,7 @@ class UserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
 
         // when & then
         GeneralException exception =
@@ -150,8 +149,7 @@ class UserServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         // isLock=true인 사용자는 조회되지 않음
-        when(userRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
 
         // when & then
         GeneralException exception =
