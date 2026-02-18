@@ -31,7 +31,7 @@ import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
-import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +39,7 @@ class ApplyFormServiceTest {
 
     @Mock private ApplyFormRepository applyFormRepository;
     @Mock private ApplyFormInterviewTimeRepository interviewTimeRepository;
-    @Mock private PreUserRepository preUserRepository;
+    @Mock private UserRepository userRepository;
     @Mock private SecurityContext securityContext;
     @Mock private Authentication authentication;
 
@@ -82,7 +82,7 @@ class ApplyFormServiceTest {
     void read_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
         when(interviewTimeRepository.findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form))
@@ -104,7 +104,7 @@ class ApplyFormServiceTest {
     @DisplayName("read - 지원서 없음 예외 발생")
     void read_NotFound() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.empty());
 
@@ -118,7 +118,7 @@ class ApplyFormServiceTest {
     @DisplayName("create - 신규 지원서 작성 성공")
     void create_Success() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.empty());
 
@@ -139,7 +139,7 @@ class ApplyFormServiceTest {
     void create_AlreadyExists() {
         // given
         ApplyFormEntity existingForm = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(existingForm));
 
@@ -157,7 +157,7 @@ class ApplyFormServiceTest {
         ApplyFormEntity deletedForm = ApplyFormEntity.create(preUser, request);
         deletedForm.softDelete();
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(deletedForm));
 
@@ -175,7 +175,7 @@ class ApplyFormServiceTest {
     void update_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
 
@@ -207,7 +207,7 @@ class ApplyFormServiceTest {
     void deleteSoft_Success() {
         // given
         ApplyFormEntity form = ApplyFormEntity.create(preUser, request);
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(preUser));
         when(applyFormRepository.findByPreUser(preUser)).thenReturn(Optional.of(form));
 
@@ -247,7 +247,7 @@ class ApplyFormServiceTest {
     @DisplayName("currentPreUser - 유저를 찾을 수 없는 경우 예외 발생")
     void currentPreUser_UserNotFound() {
         // given
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.empty());
 
         // when & then

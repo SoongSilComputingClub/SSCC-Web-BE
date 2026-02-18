@@ -21,14 +21,14 @@ import com.example.ssccwebbe.domain.user.code.UserErrorCode;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @ExtendWith(MockitoExtension.class)
 class PreUserServiceImplTest {
 
-    @Mock private PreUserRepository preUserRepository;
+    @Mock private UserRepository userRepository;
 
     @Mock private SecurityContext securityContext;
 
@@ -59,7 +59,7 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
@@ -72,7 +72,7 @@ class PreUserServiceImplTest {
         assertThat(result.getNickname()).isEqualTo(nickname);
         assertThat(result.getSocial()).isFalse();
 
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
@@ -99,7 +99,7 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
@@ -112,7 +112,7 @@ class PreUserServiceImplTest {
         assertThat(result.getNickname()).isEqualTo(nickname);
         assertThat(result.getSocial()).isTrue();
 
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
@@ -126,7 +126,7 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -135,7 +135,7 @@ class PreUserServiceImplTest {
                         GeneralException.class, () -> preUserService.readPreUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
@@ -150,7 +150,7 @@ class PreUserServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         // isLock=true인 사용자는 조회되지 않음
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -159,7 +159,7 @@ class PreUserServiceImplTest {
                         GeneralException.class, () -> preUserService.readPreUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
@@ -185,7 +185,7 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
@@ -222,7 +222,7 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when

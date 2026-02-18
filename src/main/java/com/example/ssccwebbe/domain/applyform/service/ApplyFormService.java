@@ -15,7 +15,7 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntit
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
-import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class ApplyFormService {
 
     private final ApplyFormRepository applyFormRepository;
     private final ApplyFormInterviewTimeRepository interviewTimeRepository;
-    private final PreUserRepository preUserRepository;
+    private final UserRepository userRepository;
 
     // 지원서 조회용
     @Transactional(readOnly = true)
@@ -125,7 +125,7 @@ public class ApplyFormService {
     private UserEntity currentPreUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return preUserRepository
+        return userRepository
                 .findByUsernameAndIsLock(username, false)
                 .orElseThrow(() -> new GeneralException(ApplyFormErrorCode.USER_NOT_FOUND));
     }

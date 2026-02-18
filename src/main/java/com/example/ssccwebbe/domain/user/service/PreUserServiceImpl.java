@@ -21,7 +21,7 @@ import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreUserService {
 
-    private final PreUserRepository preUserRepository;
+    private final UserRepository userRepository;
 
     // 소셜 로그인 ( 로그인시 : 신규는 가입 처리, 기존 회원은 회원정보 업데이트)
     // Oauth2 관련 빈이 유저 정보를 받을 경우, 유저 정보를 OAuth2UserRequest 객체를 파라미터로 넘기며 loadUser 를 호출함
@@ -72,7 +72,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
 
         // 데이터베이스 조회 -> 존재하면 업데이트, 없으면 신규 가입
         Optional<UserEntity> entity =
-                preUserRepository.findByUsernameAndIsSocial(username, true);
+                userRepository.findByUsernameAndIsSocial(username, true);
 
         // 기존 회원인 경우
         if (entity.isPresent()) {
@@ -85,7 +85,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
             dto.setEmail(email);
             entity.get().updateUser(dto);
 
-            preUserRepository.save(entity.get());
+            userRepository.save(entity.get());
 
             // 신규 회원인 경우
         } else {
@@ -101,7 +101,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
                             .email(email)
                             .build();
 
-            preUserRepository.save(newUserEntity);
+            userRepository.save(newUserEntity);
             role = UserRoleType.PREUSER.name(); // 신규 유저의 role 변수 업데이트
         }
 
@@ -120,7 +120,7 @@ public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreU
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserEntity entity =
-                preUserRepository
+                userRepository
                         .findByUsernameAndIsLock(username, false)
                         .orElseThrow(() -> new GeneralException(UserErrorCode.USER_NOT_FOUND));
 

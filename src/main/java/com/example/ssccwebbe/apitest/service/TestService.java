@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
-import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TestService {
 
-    private final PreUserRepository preUserRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
     @Transactional
@@ -26,7 +26,7 @@ public class TestService {
 
         // 1. 유저 조회 (isSocial=false인 유저)
         Optional<UserEntity> existingUser =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+                userRepository.findByUsernameAndIsSocial(username, false);
 
         UserEntity user;
 
@@ -44,7 +44,7 @@ public class TestService {
                             .socialProviderType(null)
                             .build();
 
-            preUserRepository.save(user);
+            userRepository.save(user);
         } else {
             user = existingUser.get();
         }

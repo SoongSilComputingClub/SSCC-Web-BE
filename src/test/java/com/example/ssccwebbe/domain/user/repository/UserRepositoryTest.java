@@ -19,13 +19,13 @@ import com.example.ssccwebbe.global.security.UserRoleType;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class PreUserRepositoryTest {
+class UserRepositoryTest {
 
-    @Autowired private PreUserRepository preUserRepository;
+    @Autowired private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        preUserRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -44,11 +44,11 @@ class PreUserRepositoryTest {
                         .nickname("Social User")
                         .email("socialuser@test.com")
                         .build();
-        preUserRepository.save(socialUser);
+        userRepository.save(socialUser);
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, true);
+                userRepository.findByUsernameAndIsSocial(username, true);
 
         // then
         assertThat(result).isPresent();
@@ -73,11 +73,11 @@ class PreUserRepositoryTest {
                         .nickname("Regular User")
                         .email("regularuser@test.com")
                         .build();
-        preUserRepository.save(regularUser);
+        userRepository.save(regularUser);
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+                userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isPresent();
@@ -94,7 +94,7 @@ class PreUserRepositoryTest {
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(nonExistingUsername, true);
+                userRepository.findByUsernameAndIsSocial(nonExistingUsername, true);
 
         // then
         assertThat(result).isEmpty();
@@ -140,13 +140,13 @@ class PreUserRepositoryTest {
                         .email("regular2@test.com")
                         .build();
 
-        preUserRepository.save(socialUser1);
-        preUserRepository.save(regularUser1);
-        preUserRepository.save(regularUser2);
+        userRepository.save(socialUser1);
+        userRepository.save(regularUser1);
+        userRepository.save(regularUser2);
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial("regular1@test.com", false);
+                userRepository.findByUsernameAndIsSocial("regular1@test.com", false);
 
         // then
         assertThat(result).isPresent();
@@ -171,11 +171,11 @@ class PreUserRepositoryTest {
                         .nickname("User")
                         .email("user@test.com")
                         .build();
-        preUserRepository.save(socialUser);
+        userRepository.save(socialUser);
 
         // when - isSocial이 false로 조회
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+                userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isEmpty();
@@ -197,10 +197,10 @@ class PreUserRepositoryTest {
                         .nickname("Locked User")
                         .email("lockeduser@test.com")
                         .build();
-        preUserRepository.save(lockedUser);
+        userRepository.save(lockedUser);
 
         // when
-        Optional<UserEntity> result = preUserRepository.findByUsernameAndIsLock(username, true);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, true);
 
         // then
         assertThat(result).isPresent();
@@ -224,10 +224,10 @@ class PreUserRepositoryTest {
                         .nickname("Normal User")
                         .email("normaluser@test.com")
                         .build();
-        preUserRepository.save(normalUser);
+        userRepository.save(normalUser);
 
         // when
-        Optional<UserEntity> result = preUserRepository.findByUsernameAndIsLock(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, false);
 
         // then
         assertThat(result).isPresent();
@@ -243,7 +243,7 @@ class PreUserRepositoryTest {
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsLock(nonExistingUsername, false);
+                userRepository.findByUsernameAndIsLock(nonExistingUsername, false);
 
         // then
         assertThat(result).isEmpty();
@@ -289,13 +289,13 @@ class PreUserRepositoryTest {
                         .email("normal2@test.com")
                         .build();
 
-        preUserRepository.save(lockedUser);
-        preUserRepository.save(normalUser1);
-        preUserRepository.save(normalUser2);
+        userRepository.save(lockedUser);
+        userRepository.save(normalUser1);
+        userRepository.save(normalUser2);
 
         // when
         Optional<UserEntity> result =
-                preUserRepository.findByUsernameAndIsLock("normal1@test.com", false);
+                userRepository.findByUsernameAndIsLock("normal1@test.com", false);
 
         // then
         assertThat(result).isPresent();
@@ -320,10 +320,10 @@ class PreUserRepositoryTest {
                         .nickname("Test User")
                         .email("testuser@test.com")
                         .build();
-        preUserRepository.save(lockedUser);
+        userRepository.save(lockedUser);
 
         // when - isLock이 false로 조회
-        Optional<UserEntity> result = preUserRepository.findByUsernameAndIsLock(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, false);
 
         // then
         assertThat(result).isEmpty();
