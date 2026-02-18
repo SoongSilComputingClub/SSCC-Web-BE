@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.user.entity.PreUserRefreshEntity;
+import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -30,7 +30,7 @@ class PreUserRefreshRepositoryTest {
         preUserRefreshRepository.deleteAll();
     }
 
-    private void updateCreatedDate(PreUserRefreshEntity entity, LocalDateTime createdDate) {
+    private void updateCreatedDate(UserRefreshEntity entity, LocalDateTime createdDate) {
         entityManager
                 .createNativeQuery(
                         "UPDATE pre_user_refresh_entity SET created_date = :createdDate WHERE id ="
@@ -47,8 +47,8 @@ class PreUserRefreshRepositoryTest {
     void existsByRefresh_ExistingToken_ReturnsTrue() {
         // given
         String refreshToken = "test-refresh-token-12345";
-        PreUserRefreshEntity refreshEntity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refreshEntity =
+                UserRefreshEntity.builder()
                         .username("user@test.com")
                         .refresh(refreshToken)
                         .build();
@@ -82,11 +82,11 @@ class PreUserRefreshRepositoryTest {
         String token2 = "refresh-token-2";
         String token3 = "refresh-token-3";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -110,11 +110,11 @@ class PreUserRefreshRepositoryTest {
         String oldToken = "old-refresh-token";
         String newToken = "new-refresh-token";
 
-        PreUserRefreshEntity oldRefresh =
-                PreUserRefreshEntity.builder().username(username).refresh(oldToken).build();
+        UserRefreshEntity oldRefresh =
+                UserRefreshEntity.builder().username(username).refresh(oldToken).build();
 
-        PreUserRefreshEntity newRefresh =
-                PreUserRefreshEntity.builder().username(username).refresh(newToken).build();
+        UserRefreshEntity newRefresh =
+                UserRefreshEntity.builder().username(username).refresh(newToken).build();
 
         preUserRefreshRepository.save(oldRefresh);
         preUserRefreshRepository.save(newRefresh);
@@ -145,8 +145,8 @@ class PreUserRefreshRepositoryTest {
     void existsByRefresh_LongToken_Success() {
         // given
         String longToken = "a".repeat(500); // 512자 제한 내에서
-        PreUserRefreshEntity refreshEntity =
-                PreUserRefreshEntity.builder().username("user@test.com").refresh(longToken).build();
+        UserRefreshEntity refreshEntity =
+                UserRefreshEntity.builder().username("user@test.com").refresh(longToken).build();
         preUserRefreshRepository.save(refreshEntity);
 
         // when
@@ -161,8 +161,8 @@ class PreUserRefreshRepositoryTest {
     void deleteByRefresh_ExistingToken_Success() {
         // given
         String refreshToken = "delete-test-token";
-        PreUserRefreshEntity refreshEntity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refreshEntity =
+                UserRefreshEntity.builder()
                         .username("user@test.com")
                         .refresh(refreshToken)
                         .build();
@@ -198,14 +198,14 @@ class PreUserRefreshRepositoryTest {
         String token2 = "token-to-keep-1";
         String token3 = "token-to-keep-2";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -228,11 +228,11 @@ class PreUserRefreshRepositoryTest {
         String oldToken = "old-token-to-delete";
         String newToken = "new-token-to-keep";
 
-        PreUserRefreshEntity oldRefresh =
-                PreUserRefreshEntity.builder().username(username).refresh(oldToken).build();
+        UserRefreshEntity oldRefresh =
+                UserRefreshEntity.builder().username(username).refresh(oldToken).build();
 
-        PreUserRefreshEntity newRefresh =
-                PreUserRefreshEntity.builder().username(username).refresh(newToken).build();
+        UserRefreshEntity newRefresh =
+                UserRefreshEntity.builder().username(username).refresh(newToken).build();
 
         preUserRefreshRepository.save(oldRefresh);
         preUserRefreshRepository.save(newRefresh);
@@ -253,14 +253,14 @@ class PreUserRefreshRepositoryTest {
         String token2 = "token-2";
         String token3 = "token-3";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -283,11 +283,11 @@ class PreUserRefreshRepositoryTest {
         String token1 = "token-1";
         String token2 = "token-2";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username("user1@test.com").refresh(token1).build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -308,8 +308,8 @@ class PreUserRefreshRepositoryTest {
         // given
         String username = "user@test.com";
         String token = "refresh-token";
-        PreUserRefreshEntity refreshEntity =
-                PreUserRefreshEntity.builder().username(username).refresh(token).build();
+        UserRefreshEntity refreshEntity =
+                UserRefreshEntity.builder().username(username).refresh(token).build();
         preUserRefreshRepository.save(refreshEntity);
 
         // when
@@ -343,20 +343,20 @@ class PreUserRefreshRepositoryTest {
         String userToKeep1 = "keep1@test.com";
         String userToKeep2 = "keep2@test.com";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder()
                         .username(userToDelete)
                         .refresh("token-to-delete")
                         .build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder()
                         .username(userToKeep1)
                         .refresh("token-to-keep-1")
                         .build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder()
                         .username(userToKeep2)
                         .refresh("token-to-keep-2")
                         .build();
@@ -384,14 +384,14 @@ class PreUserRefreshRepositoryTest {
         String token2 = "token-2";
         String token3 = "token-3";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username(username).refresh(token1).build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username(username).refresh(token1).build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username(username).refresh(token2).build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username(username).refresh(token2).build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder().username(username).refresh(token3).build();
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder().username(username).refresh(token3).build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -414,20 +414,20 @@ class PreUserRefreshRepositoryTest {
         String userToDelete = "delete@test.com";
         String otherUser = "other@test.com";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder()
                         .username(userToDelete)
                         .refresh("delete-token-1")
                         .build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder()
                         .username(userToDelete)
                         .refresh("delete-token-2")
                         .build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder().username(otherUser).refresh("keep-token").build();
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder().username(otherUser).refresh("keep-token").build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -452,14 +452,14 @@ class PreUserRefreshRepositoryTest {
         String user1 = "user1@test.com";
         String user2 = "user2@test.com";
 
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder().username(user1).refresh("token-1").build();
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder().username(user1).refresh("token-1").build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder().username(user1).refresh("token-2").build();
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder().username(user1).refresh("token-2").build();
 
-        PreUserRefreshEntity refresh3 =
-                PreUserRefreshEntity.builder().username(user2).refresh("token-3").build();
+        UserRefreshEntity refresh3 =
+                UserRefreshEntity.builder().username(user2).refresh("token-3").build();
 
         preUserRefreshRepository.save(refresh1);
         preUserRefreshRepository.save(refresh2);
@@ -484,14 +484,14 @@ class PreUserRefreshRepositoryTest {
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
         LocalDateTime newTime = LocalDateTime.now();
 
-        PreUserRefreshEntity oldRefresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity oldRefresh1 =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("old-token-1")
                         .build();
 
-        PreUserRefreshEntity oldRefresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity oldRefresh2 =
+                UserRefreshEntity.builder()
                         .username("user2@test.com")
                         .refresh("old-token-2")
                         .build();
@@ -503,8 +503,8 @@ class PreUserRefreshRepositoryTest {
         updateCreatedDate(oldRefresh1, oldTime);
         updateCreatedDate(oldRefresh2, oldTime);
 
-        PreUserRefreshEntity newRefresh =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity newRefresh =
+                UserRefreshEntity.builder()
                         .username("user3@test.com")
                         .refresh("new-token")
                         .build();
@@ -528,14 +528,14 @@ class PreUserRefreshRepositoryTest {
     @DisplayName("모든 토큰보다 이전 시간으로 삭제하면 아무것도 삭제되지 않는다")
     void deleteByCreatedDateBefore_BeforeAllTokens_DeletesNothing() {
         // given
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("token-1")
                         .build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder()
                         .username("user2@test.com")
                         .refresh("token-2")
                         .build();
@@ -558,14 +558,14 @@ class PreUserRefreshRepositoryTest {
     @DisplayName("모든 토큰보다 이후 시간으로 삭제하면 모든 토큰이 삭제된다")
     void deleteByCreatedDateBefore_AfterAllTokens_DeletesAll() {
         // given
-        PreUserRefreshEntity refresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh1 =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("token-1")
                         .build();
 
-        PreUserRefreshEntity refresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity refresh2 =
+                UserRefreshEntity.builder()
                         .username("user2@test.com")
                         .refresh("token-2")
                         .build();
@@ -593,14 +593,14 @@ class PreUserRefreshRepositoryTest {
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
         LocalDateTime newTime = LocalDateTime.now();
 
-        PreUserRefreshEntity oldRefresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity oldRefresh1 =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("old-token-1")
                         .build();
 
-        PreUserRefreshEntity oldRefresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity oldRefresh2 =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("old-token-2")
                         .build();
@@ -612,14 +612,14 @@ class PreUserRefreshRepositoryTest {
         updateCreatedDate(oldRefresh1, oldTime);
         updateCreatedDate(oldRefresh2, oldTime);
 
-        PreUserRefreshEntity newRefresh1 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity newRefresh1 =
+                UserRefreshEntity.builder()
                         .username("user2@test.com")
                         .refresh("new-token-1")
                         .build();
 
-        PreUserRefreshEntity newRefresh2 =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity newRefresh2 =
+                UserRefreshEntity.builder()
                         .username("user3@test.com")
                         .refresh("new-token-2")
                         .build();
@@ -662,11 +662,11 @@ class PreUserRefreshRepositoryTest {
         LocalDateTime cutoffTime = LocalDateTime.now().minusHours(1);
         LocalDateTime newTime = LocalDateTime.now();
 
-        PreUserRefreshEntity oldToken1 =
-                PreUserRefreshEntity.builder().username(username).refresh("old-token-1").build();
+        UserRefreshEntity oldToken1 =
+                UserRefreshEntity.builder().username(username).refresh("old-token-1").build();
 
-        PreUserRefreshEntity oldToken2 =
-                PreUserRefreshEntity.builder().username(username).refresh("old-token-2").build();
+        UserRefreshEntity oldToken2 =
+                UserRefreshEntity.builder().username(username).refresh("old-token-2").build();
 
         preUserRefreshRepository.save(oldToken1);
         preUserRefreshRepository.save(oldToken2);
@@ -675,8 +675,8 @@ class PreUserRefreshRepositoryTest {
         updateCreatedDate(oldToken1, oldTime);
         updateCreatedDate(oldToken2, oldTime);
 
-        PreUserRefreshEntity newToken =
-                PreUserRefreshEntity.builder().username(username).refresh("new-token").build();
+        UserRefreshEntity newToken =
+                UserRefreshEntity.builder().username(username).refresh("new-token").build();
 
         preUserRefreshRepository.save(newToken);
         preUserRefreshRepository.flush();

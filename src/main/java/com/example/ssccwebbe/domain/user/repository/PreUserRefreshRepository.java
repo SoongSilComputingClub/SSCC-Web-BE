@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.ssccwebbe.domain.user.entity.PreUserRefreshEntity;
+import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
 
-public interface PreUserRefreshRepository extends JpaRepository<PreUserRefreshEntity, Long> {
+public interface PreUserRefreshRepository extends JpaRepository<UserRefreshEntity, Long> {
     Boolean existsByRefresh(String refreshToken);
 
     void deleteByRefresh(String refresh);

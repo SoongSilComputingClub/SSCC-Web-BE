@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.user.entity.PreUserRefreshEntity;
+import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
 import com.example.ssccwebbe.domain.user.repository.PreUserRefreshRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
@@ -68,8 +68,8 @@ public class PreJwtServiceImpl implements JwtService {
         String newRefreshToken = JwtUtil.createJwt(username, role, false);
 
         // 기존 Refresh 토큰 DB 삭제 후 신규 추가
-        PreUserRefreshEntity newRefreshEntity =
-                PreUserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
+        UserRefreshEntity newRefreshEntity =
+                UserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
 
         removeRefresh(refreshToken);
         preUserRefreshRepository.flush(); // 같은 트랜잭션 내부라 : 삭제 -> 생성 문제 해결
@@ -112,8 +112,8 @@ public class PreJwtServiceImpl implements JwtService {
         String newRefreshToken = JwtUtil.createJwt(username, role, false);
 
         // 기존 Refresh 토큰 DB 삭제 후 신규 추가
-        PreUserRefreshEntity newRefreshEntity =
-                PreUserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
+        UserRefreshEntity newRefreshEntity =
+                UserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
 
         removeRefresh(refreshToken);
         preUserRefreshRepository.save(newRefreshEntity);
@@ -124,8 +124,8 @@ public class PreJwtServiceImpl implements JwtService {
     // JWT Refresh 토큰 발급 후 저장 메소드
     @Transactional
     public void addRefresh(String username, String refreshToken) {
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder().username(username).refresh(refreshToken).build();
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder().username(username).refresh(refreshToken).build();
 
         preUserRefreshRepository.save(entity);
     }

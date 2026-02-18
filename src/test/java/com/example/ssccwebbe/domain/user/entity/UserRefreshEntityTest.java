@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @ActiveProfiles("test")
-class PreUserRefreshEntityTest {
+class UserRefreshEntityTest {
 
     @Autowired private TestEntityManager entityManager;
 
@@ -19,8 +19,8 @@ class PreUserRefreshEntityTest {
     @DisplayName("Builder를 사용하여 PreUserRefreshEntity를 생성할 수 있다")
     void builder_CreatesEntity_Success() {
         // given & when
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder()
                         .username("user@test.com")
                         .refresh("test-refresh-token-12345")
                         .build();
@@ -35,17 +35,17 @@ class PreUserRefreshEntityTest {
     @DisplayName("엔티티를 저장하고 조회할 수 있다")
     void save_AndFind_Success() {
         // given
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder()
                         .username("savetest@test.com")
                         .refresh("save-test-refresh-token")
                         .build();
 
         // when
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
         entityManager.clear(); // 캐시 클리어
-        PreUserRefreshEntity foundEntity =
-                entityManager.find(PreUserRefreshEntity.class, savedEntity.getId());
+        UserRefreshEntity foundEntity =
+                entityManager.find(UserRefreshEntity.class, savedEntity.getId());
 
         // then
         assertThat(foundEntity).isNotNull();
@@ -60,15 +60,15 @@ class PreUserRefreshEntityTest {
         // given
         String username = "user@test.com";
 
-        PreUserRefreshEntity token1 =
-                PreUserRefreshEntity.builder().username(username).refresh("token-1").build();
+        UserRefreshEntity token1 =
+                UserRefreshEntity.builder().username(username).refresh("token-1").build();
 
-        PreUserRefreshEntity token2 =
-                PreUserRefreshEntity.builder().username(username).refresh("token-2").build();
+        UserRefreshEntity token2 =
+                UserRefreshEntity.builder().username(username).refresh("token-2").build();
 
         // when
-        PreUserRefreshEntity savedToken1 = entityManager.persistAndFlush(token1);
-        PreUserRefreshEntity savedToken2 = entityManager.persistAndFlush(token2);
+        UserRefreshEntity savedToken1 = entityManager.persistAndFlush(token1);
+        UserRefreshEntity savedToken2 = entityManager.persistAndFlush(token2);
 
         // then
         assertThat(savedToken1.getId()).isNotNull();
@@ -82,21 +82,21 @@ class PreUserRefreshEntityTest {
     @DisplayName("여러 사용자의 refresh token을 저장할 수 있다")
     void save_MultipleUsersTokens_Success() {
         // given
-        PreUserRefreshEntity user1Token =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity user1Token =
+                UserRefreshEntity.builder()
                         .username("user1@test.com")
                         .refresh("user1-refresh-token")
                         .build();
 
-        PreUserRefreshEntity user2Token =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity user2Token =
+                UserRefreshEntity.builder()
                         .username("user2@test.com")
                         .refresh("user2-refresh-token")
                         .build();
 
         // when
-        PreUserRefreshEntity savedUser1Token = entityManager.persistAndFlush(user1Token);
-        PreUserRefreshEntity savedUser2Token = entityManager.persistAndFlush(user2Token);
+        UserRefreshEntity savedUser1Token = entityManager.persistAndFlush(user1Token);
+        UserRefreshEntity savedUser2Token = entityManager.persistAndFlush(user2Token);
 
         // then
         assertThat(savedUser1Token.getId()).isNotNull();
@@ -110,14 +110,14 @@ class PreUserRefreshEntityTest {
     void save_LongRefreshToken_Success() {
         // given
         String longToken = "a".repeat(500); // 512자 제한 내
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder().username("user@test.com").refresh(longToken).build();
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder().username("user@test.com").refresh(longToken).build();
 
         // when
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
         entityManager.clear();
-        PreUserRefreshEntity foundEntity =
-                entityManager.find(PreUserRefreshEntity.class, savedEntity.getId());
+        UserRefreshEntity foundEntity =
+                entityManager.find(UserRefreshEntity.class, savedEntity.getId());
 
         // then
         assertThat(foundEntity).isNotNull();
@@ -129,14 +129,14 @@ class PreUserRefreshEntityTest {
     @DisplayName("소셜 로그인 사용자의 refresh token을 저장할 수 있다")
     void save_SocialUserToken_Success() {
         // given
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder()
                         .username("GOOGLE_123456789")
                         .refresh("google-user-refresh-token")
                         .build();
 
         // when
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
 
         // then
         assertThat(savedEntity.getId()).isNotNull();
@@ -148,13 +148,13 @@ class PreUserRefreshEntityTest {
     @DisplayName("저장된 엔티티를 삭제할 수 있다")
     void delete_SavedEntity_Success() {
         // given
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder()
                         .username("user@test.com")
                         .refresh("delete-test-token")
                         .build();
 
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
         Long savedId = savedEntity.getId();
 
         // when
@@ -163,8 +163,8 @@ class PreUserRefreshEntityTest {
         entityManager.clear();
 
         // then
-        PreUserRefreshEntity deletedEntity =
-                entityManager.find(PreUserRefreshEntity.class, savedId);
+        UserRefreshEntity deletedEntity =
+                entityManager.find(UserRefreshEntity.class, savedId);
         assertThat(deletedEntity).isNull();
     }
 
@@ -175,14 +175,14 @@ class PreUserRefreshEntityTest {
         String username = "testuser@test.com";
         String refreshToken = "test-refresh-token-abc123";
 
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder().username(username).refresh(refreshToken).build();
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder().username(username).refresh(refreshToken).build();
 
         // when
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
         entityManager.clear();
-        PreUserRefreshEntity foundEntity =
-                entityManager.find(PreUserRefreshEntity.class, savedEntity.getId());
+        UserRefreshEntity foundEntity =
+                entityManager.find(UserRefreshEntity.class, savedEntity.getId());
 
         // then
         assertThat(foundEntity).isNotNull();
@@ -195,15 +195,15 @@ class PreUserRefreshEntityTest {
     @DisplayName("ID가 자동으로 생성된다")
     void save_GeneratesId_Success() {
         // given
-        PreUserRefreshEntity entity =
-                PreUserRefreshEntity.builder()
+        UserRefreshEntity entity =
+                UserRefreshEntity.builder()
                         .username("user@test.com")
                         .refresh("auto-id-test-token")
                         .build();
 
         // when
         assertThat(entity.getId()).isNull(); // 저장 전에는 null
-        PreUserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
+        UserRefreshEntity savedEntity = entityManager.persistAndFlush(entity);
 
         // then
         assertThat(savedEntity.getId()).isNotNull(); // 저장 후에는 자동 생성
