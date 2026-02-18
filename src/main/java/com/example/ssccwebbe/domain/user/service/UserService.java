@@ -7,5 +7,5 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
 
 public interface UserService extends OAuth2UserService<OAuth2UserRequest, OAuth2User> {
-    UserResponseDto readPreUser();
+    UserResponseDto readUser();
 }

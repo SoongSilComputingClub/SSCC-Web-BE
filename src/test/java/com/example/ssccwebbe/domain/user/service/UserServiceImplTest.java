@@ -38,7 +38,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - 일반 사용자 정보를 정상적으로 조회한다")
-    void readPreUser_RegularUser_Success() {
+    void readUser_RegularUser_Success() {
         // given
         String username = "testuser@test.com";
         String email = "testuser@test.com";
@@ -63,7 +63,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -77,7 +77,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - 소셜 로그인 사용자 정보를 정상적으로 조회한다")
-    void readPreUser_SocialUser_Success() {
+    void readUser_SocialUser_Success() {
         // given
         String username = "GOOGLE_123456789";
         String email = "socialuser@gmail.com";
@@ -103,7 +103,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -117,7 +117,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
-    void readPreUser_UserNotFound_ThrowsException() {
+    void readUser_UserNotFound_ThrowsException() {
         // given
         String username = "nonexistent@test.com";
 
@@ -132,7 +132,7 @@ class UserServiceImplTest {
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readPreUser());
+                        GeneralException.class, () -> preUserService.readUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
@@ -140,7 +140,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - 계정이 잠긴 사용자는 조회되지 않는다")
-    void readPreUser_LockedUser_NotFound() {
+    void readUser_LockedUser_NotFound() {
         // given
         String username = "lockeduser@test.com";
 
@@ -156,7 +156,7 @@ class UserServiceImplTest {
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readPreUser());
+                        GeneralException.class, () -> preUserService.readUser());
 
         assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
         verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
@@ -164,7 +164,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - PREUSER 권한 사용자도 정상적으로 조회된다")
-    void readPreUser_PreUserRole_Success() {
+    void readPreUser_UserRole_Success() {
         // given
         String username = "preuser@test.com";
         String email = "preuser@test.com";
@@ -189,7 +189,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -201,7 +201,7 @@ class UserServiceImplTest {
 
     @Test
     @DisplayName("readPreUser - ADMIN 권한 사용자도 정상적으로 조회된다")
-    void readPreUser_AdminRole_Success() {
+    void readUser_AdminRole_Success() {
         // given
         String username = "admin@test.com";
         String email = "admin@test.com";
@@ -226,7 +226,7 @@ class UserServiceImplTest {
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        UserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = preUserService.readUser();
 
         // then
         assertThat(result).isNotNull();

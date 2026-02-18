@@ -116,7 +116,7 @@ public class UserServiceImpl extends DefaultOAuth2UserService implements UserSer
 
     // 자체/소셜 유저 정보 조회
     @Transactional(readOnly = true)
-    public UserResponseDto readPreUser() {
+    public UserResponseDto readUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         UserEntity entity =
