@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PreUserServiceImpl extends DefaultOAuth2UserService implements PreUserService {
+public class UserServiceImpl extends DefaultOAuth2UserService implements UserService {
 
     private final UserRepository userRepository;
 

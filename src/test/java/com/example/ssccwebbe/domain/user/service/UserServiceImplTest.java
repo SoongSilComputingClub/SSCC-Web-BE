@@ -26,7 +26,7 @@ import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @ExtendWith(MockitoExtension.class)
-class PreUserServiceImplTest {
+class UserServiceImplTest {
 
     @Mock private UserRepository userRepository;
 
@@ -34,7 +34,7 @@ class PreUserServiceImplTest {
 
     @Mock private Authentication authentication;
 
-    @InjectMocks private PreUserServiceImpl preUserService;
+    @InjectMocks private UserServiceImpl preUserService;
 
     @Test
     @DisplayName("readPreUser - 일반 사용자 정보를 정상적으로 조회한다")
