@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.dto;
+package com.example.ssccwebbe.domain.user.dto;
 
 import java.util.Collection;
 import java.util.Map;

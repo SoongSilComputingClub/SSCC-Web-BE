@@ -14,8 +14,8 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
 import lombok.RequiredArgsConstructor;

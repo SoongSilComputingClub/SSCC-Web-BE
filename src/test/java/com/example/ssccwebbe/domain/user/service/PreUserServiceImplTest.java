@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.service;
+package com.example.ssccwebbe.domain.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -17,11 +17,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.example.ssccwebbe.domain.preuser.code.PreUserErrorCode;
-import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.code.PreUserErrorCode;
+import com.example.ssccwebbe.domain.user.dto.PreUserResponseDto;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 

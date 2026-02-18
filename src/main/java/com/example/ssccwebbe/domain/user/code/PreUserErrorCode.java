@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.code;
+package com.example.ssccwebbe.domain.user.code;
 
 import org.springframework.http.HttpStatus;
 

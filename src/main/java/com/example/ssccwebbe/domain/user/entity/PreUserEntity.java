@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.entity;
+package com.example.ssccwebbe.domain.user.entity;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +16,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
+import com.example.ssccwebbe.domain.user.dto.PreUserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 import lombok.AllArgsConstructor;

@@ -30,8 +30,8 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
 @ExtendWith(MockitoExtension.class)

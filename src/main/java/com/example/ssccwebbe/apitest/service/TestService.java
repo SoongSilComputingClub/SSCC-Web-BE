@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.repository.PreUserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;

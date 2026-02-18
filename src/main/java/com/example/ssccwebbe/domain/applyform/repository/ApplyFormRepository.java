@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
 
 // PreUser 기준으로 본인의 지원서 1개를 조회하는 메서드를 제공
 // -> 조회 이유는 이미 작성한 지원서가 있으면 그거 내용을 그대로 불러와서 적용시키기 위함

@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.entity;
+package com.example.ssccwebbe.domain.user.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 
-import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
+import com.example.ssccwebbe.domain.user.dto.PreUserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @DataJpaTest

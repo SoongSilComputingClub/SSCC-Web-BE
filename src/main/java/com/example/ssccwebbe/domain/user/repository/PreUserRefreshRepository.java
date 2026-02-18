@@ -1,10 +1,10 @@
-package com.example.ssccwebbe.domain.preuser.repository;
+package com.example.ssccwebbe.domain.user.repository;
 
 import java.time.LocalDateTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.ssccwebbe.domain.preuser.entity.PreUserRefreshEntity;
+import com.example.ssccwebbe.domain.user.entity.PreUserRefreshEntity;
 
 public interface PreUserRefreshRepository extends JpaRepository<PreUserRefreshEntity, Long> {
     Boolean existsByRefresh(String refreshToken);

@@ -21,7 +21,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.ssccwebbe.domain.applyform.dto.ApplyFormCreateOrUpdateRequest;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

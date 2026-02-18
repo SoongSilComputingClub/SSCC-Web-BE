@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.repository;
+package com.example.ssccwebbe.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,8 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @SpringBootTest

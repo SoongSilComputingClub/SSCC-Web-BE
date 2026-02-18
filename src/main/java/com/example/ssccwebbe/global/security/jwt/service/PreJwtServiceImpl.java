@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.preuser.entity.PreUserRefreshEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRefreshRepository;
+import com.example.ssccwebbe.domain.user.entity.PreUserRefreshEntity;
+import com.example.ssccwebbe.domain.user.repository.PreUserRefreshRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
 import com.example.ssccwebbe.global.security.jwt.dto.JwtResponseDto;
