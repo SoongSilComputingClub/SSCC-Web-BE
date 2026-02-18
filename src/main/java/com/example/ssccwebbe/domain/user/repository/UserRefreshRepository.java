@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
 
-public interface PreUserRefreshRepository extends JpaRepository<UserRefreshEntity, Long> {
+public interface UserRefreshRepository extends JpaRepository<UserRefreshEntity, Long> {
     Boolean existsByRefresh(String refreshToken);
 
     void deleteByRefresh(String refresh);

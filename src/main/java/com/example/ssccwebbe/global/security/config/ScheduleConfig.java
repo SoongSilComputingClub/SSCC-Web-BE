@@ -7,14 +7,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.user.repository.PreUserRefreshRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRefreshRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class ScheduleConfig {
-    private final PreUserRefreshRepository preUserRefreshRepository;
+    private final UserRefreshRepository userRefreshRepository;
 
     @Value("${refresh-token.ttl-days}")
     private int refreshTokenTtlDays; // 리프레시 토큰 TTL 설정
@@ -24,6 +24,6 @@ public class ScheduleConfig {
     @Transactional
     public void refreshEntityTtlSchedule() {
         LocalDateTime cutoff = LocalDateTime.now().minusDays(refreshTokenTtlDays);
-        preUserRefreshRepository.deleteByCreatedDateBefore(cutoff);
+        userRefreshRepository.deleteByCreatedDateBefore(cutoff);
     }
 }

@@ -19,15 +19,15 @@ import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class PreUserRefreshRepositoryTest {
+class UserRefreshRepositoryTest {
 
-    @Autowired private PreUserRefreshRepository preUserRefreshRepository;
+    @Autowired private UserRefreshRepository userRefreshRepository;
 
     @Autowired private EntityManager entityManager;
 
     @BeforeEach
     void setUp() {
-        preUserRefreshRepository.deleteAll();
+        userRefreshRepository.deleteAll();
     }
 
     private void updateCreatedDate(UserRefreshEntity entity, LocalDateTime createdDate) {
@@ -52,10 +52,10 @@ class PreUserRefreshRepositoryTest {
                         .username("user@test.com")
                         .refresh(refreshToken)
                         .build();
-        preUserRefreshRepository.save(refreshEntity);
+        userRefreshRepository.save(refreshEntity);
 
         // when
-        Boolean exists = preUserRefreshRepository.existsByRefresh(refreshToken);
+        Boolean exists = userRefreshRepository.existsByRefresh(refreshToken);
 
         // then
         assertThat(exists).isTrue();
@@ -68,7 +68,7 @@ class PreUserRefreshRepositoryTest {
         String nonExistingToken = "non-existing-token";
 
         // when
-        Boolean exists = preUserRefreshRepository.existsByRefresh(nonExistingToken);
+        Boolean exists = userRefreshRepository.existsByRefresh(nonExistingToken);
 
         // then
         assertThat(exists).isFalse();
@@ -88,13 +88,13 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh2 =
                 UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
 
         // when
-        Boolean exists1 = preUserRefreshRepository.existsByRefresh(token1);
-        Boolean exists2 = preUserRefreshRepository.existsByRefresh(token2);
-        Boolean exists3 = preUserRefreshRepository.existsByRefresh(token3);
+        Boolean exists1 = userRefreshRepository.existsByRefresh(token1);
+        Boolean exists2 = userRefreshRepository.existsByRefresh(token2);
+        Boolean exists3 = userRefreshRepository.existsByRefresh(token3);
 
         // then
         assertThat(exists1).isTrue();
@@ -116,12 +116,12 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity newRefresh =
                 UserRefreshEntity.builder().username(username).refresh(newToken).build();
 
-        preUserRefreshRepository.save(oldRefresh);
-        preUserRefreshRepository.save(newRefresh);
+        userRefreshRepository.save(oldRefresh);
+        userRefreshRepository.save(newRefresh);
 
         // when
-        Boolean oldExists = preUserRefreshRepository.existsByRefresh(oldToken);
-        Boolean newExists = preUserRefreshRepository.existsByRefresh(newToken);
+        Boolean oldExists = userRefreshRepository.existsByRefresh(oldToken);
+        Boolean newExists = userRefreshRepository.existsByRefresh(newToken);
 
         // then
         assertThat(oldExists).isTrue();
@@ -134,7 +134,7 @@ class PreUserRefreshRepositoryTest {
         // given - setUp()에서 이미 deleteAll() 호출됨
 
         // when
-        Boolean exists = preUserRefreshRepository.existsByRefresh("any-token");
+        Boolean exists = userRefreshRepository.existsByRefresh("any-token");
 
         // then
         assertThat(exists).isFalse();
@@ -147,10 +147,10 @@ class PreUserRefreshRepositoryTest {
         String longToken = "a".repeat(500); // 512자 제한 내에서
         UserRefreshEntity refreshEntity =
                 UserRefreshEntity.builder().username("user@test.com").refresh(longToken).build();
-        preUserRefreshRepository.save(refreshEntity);
+        userRefreshRepository.save(refreshEntity);
 
         // when
-        Boolean exists = preUserRefreshRepository.existsByRefresh(longToken);
+        Boolean exists = userRefreshRepository.existsByRefresh(longToken);
 
         // then
         assertThat(exists).isTrue();
@@ -166,13 +166,13 @@ class PreUserRefreshRepositoryTest {
                         .username("user@test.com")
                         .refresh(refreshToken)
                         .build();
-        preUserRefreshRepository.save(refreshEntity);
+        userRefreshRepository.save(refreshEntity);
 
         // when
-        preUserRefreshRepository.deleteByRefresh(refreshToken);
+        userRefreshRepository.deleteByRefresh(refreshToken);
 
         // then
-        Boolean exists = preUserRefreshRepository.existsByRefresh(refreshToken);
+        Boolean exists = userRefreshRepository.existsByRefresh(refreshToken);
         assertThat(exists).isFalse();
     }
 
@@ -181,13 +181,13 @@ class PreUserRefreshRepositoryTest {
     void deleteByRefresh_NonExistingToken_NoError() {
         // given
         String nonExistingToken = "non-existing-token";
-        long initialCount = preUserRefreshRepository.count();
+        long initialCount = userRefreshRepository.count();
 
         // when
-        preUserRefreshRepository.deleteByRefresh(nonExistingToken);
+        userRefreshRepository.deleteByRefresh(nonExistingToken);
 
         // then - 에러 없이 정상 실행되고 count도 변하지 않음
-        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount);
+        assertThat(userRefreshRepository.count()).isEqualTo(initialCount);
     }
 
     @Test
@@ -207,17 +207,17 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh3 =
                 UserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
         // when
-        preUserRefreshRepository.deleteByRefresh(token1);
+        userRefreshRepository.deleteByRefresh(token1);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isTrue();
-        assertThat(preUserRefreshRepository.existsByRefresh(token3)).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh(token2)).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh(token3)).isTrue();
     }
 
     @Test
@@ -234,15 +234,15 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity newRefresh =
                 UserRefreshEntity.builder().username(username).refresh(newToken).build();
 
-        preUserRefreshRepository.save(oldRefresh);
-        preUserRefreshRepository.save(newRefresh);
+        userRefreshRepository.save(oldRefresh);
+        userRefreshRepository.save(newRefresh);
 
         // when
-        preUserRefreshRepository.deleteByRefresh(oldToken);
+        userRefreshRepository.deleteByRefresh(oldToken);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh(oldToken)).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh(newToken)).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh(oldToken)).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh(newToken)).isTrue();
     }
 
     @Test
@@ -262,17 +262,17 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh3 =
                 UserRefreshEntity.builder().username("user3@test.com").refresh(token3).build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
-        long initialCount = preUserRefreshRepository.count();
+        long initialCount = userRefreshRepository.count();
 
         // when
-        preUserRefreshRepository.deleteByRefresh(token2);
+        userRefreshRepository.deleteByRefresh(token2);
 
         // then
-        long afterCount = preUserRefreshRepository.count();
+        long afterCount = userRefreshRepository.count();
         assertThat(afterCount).isEqualTo(initialCount - 1);
     }
 
@@ -289,17 +289,17 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh2 =
                 UserRefreshEntity.builder().username("user2@test.com").refresh(token2).build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
 
         // when
-        preUserRefreshRepository.deleteByRefresh(token1);
-        preUserRefreshRepository.deleteByRefresh(token2);
+        userRefreshRepository.deleteByRefresh(token1);
+        userRefreshRepository.deleteByRefresh(token2);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isEqualTo(0);
-        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isFalse();
+        assertThat(userRefreshRepository.count()).isEqualTo(0);
+        assertThat(userRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh(token2)).isFalse();
     }
 
     @Test
@@ -310,15 +310,15 @@ class PreUserRefreshRepositoryTest {
         String token = "refresh-token";
         UserRefreshEntity refreshEntity =
                 UserRefreshEntity.builder().username(username).refresh(token).build();
-        preUserRefreshRepository.save(refreshEntity);
+        userRefreshRepository.save(refreshEntity);
 
         // when
-        preUserRefreshRepository.deleteByUsername(username);
+        userRefreshRepository.deleteByUsername(username);
 
         // then
-        Boolean exists = preUserRefreshRepository.existsByRefresh(token);
+        Boolean exists = userRefreshRepository.existsByRefresh(token);
         assertThat(exists).isFalse();
-        assertThat(preUserRefreshRepository.count()).isZero();
+        assertThat(userRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -326,13 +326,13 @@ class PreUserRefreshRepositoryTest {
     void deleteByUsername_NonExistingUser_NoError() {
         // given
         String nonExistingUsername = "nonexisting@test.com";
-        long initialCount = preUserRefreshRepository.count();
+        long initialCount = userRefreshRepository.count();
 
         // when
-        preUserRefreshRepository.deleteByUsername(nonExistingUsername);
+        userRefreshRepository.deleteByUsername(nonExistingUsername);
 
         // then - 에러 없이 정상 실행되고 count도 변하지 않음
-        assertThat(preUserRefreshRepository.count()).isZero();
+        assertThat(userRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -361,18 +361,18 @@ class PreUserRefreshRepositoryTest {
                         .refresh("token-to-keep-2")
                         .build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
         // when
-        preUserRefreshRepository.deleteByUsername(userToDelete);
+        userRefreshRepository.deleteByUsername(userToDelete);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh("token-to-delete")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("token-to-keep-1")).isTrue();
-        assertThat(preUserRefreshRepository.existsByRefresh("token-to-keep-2")).isTrue();
-        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
+        assertThat(userRefreshRepository.existsByRefresh("token-to-delete")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("token-to-keep-1")).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh("token-to-keep-2")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(2);
     }
 
     @Test
@@ -393,18 +393,18 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh3 =
                 UserRefreshEntity.builder().username(username).refresh(token3).build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
         // when
-        preUserRefreshRepository.deleteByUsername(username);
+        userRefreshRepository.deleteByUsername(username);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh(token1)).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh(token2)).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh(token3)).isFalse();
-        assertThat(preUserRefreshRepository.count()).isZero();
+        assertThat(userRefreshRepository.existsByRefresh(token1)).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh(token2)).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh(token3)).isFalse();
+        assertThat(userRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -429,20 +429,20 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh3 =
                 UserRefreshEntity.builder().username(otherUser).refresh("keep-token").build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
-        long initialCount = preUserRefreshRepository.count();
+        long initialCount = userRefreshRepository.count();
 
         // when
-        preUserRefreshRepository.deleteByUsername(userToDelete);
+        userRefreshRepository.deleteByUsername(userToDelete);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh("delete-token-1")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("delete-token-2")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("keep-token")).isTrue();
-        assertThat(preUserRefreshRepository.count()).isEqualTo(initialCount - 2);
+        assertThat(userRefreshRepository.existsByRefresh("delete-token-1")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("delete-token-2")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("keep-token")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(initialCount - 2);
     }
 
     @Test
@@ -461,17 +461,17 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity refresh3 =
                 UserRefreshEntity.builder().username(user2).refresh("token-3").build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.save(refresh3);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh3);
 
-        long initialCount = preUserRefreshRepository.count();
+        long initialCount = userRefreshRepository.count();
 
         // when
-        preUserRefreshRepository.deleteByUsername(user1);
+        userRefreshRepository.deleteByUsername(user1);
 
         // then
-        long afterCount = preUserRefreshRepository.count();
+        long afterCount = userRefreshRepository.count();
         assertThat(afterCount).isEqualTo(initialCount - 2);
         assertThat(afterCount).isEqualTo(1);
     }
@@ -496,9 +496,9 @@ class PreUserRefreshRepositoryTest {
                         .refresh("old-token-2")
                         .build();
 
-        preUserRefreshRepository.save(oldRefresh1);
-        preUserRefreshRepository.save(oldRefresh2);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(oldRefresh1);
+        userRefreshRepository.save(oldRefresh2);
+        userRefreshRepository.flush();
 
         updateCreatedDate(oldRefresh1, oldTime);
         updateCreatedDate(oldRefresh2, oldTime);
@@ -509,19 +509,19 @@ class PreUserRefreshRepositoryTest {
                         .refresh("new-token")
                         .build();
 
-        preUserRefreshRepository.save(newRefresh);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(newRefresh);
+        userRefreshRepository.flush();
 
         updateCreatedDate(newRefresh, newTime);
 
         // when
-        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+        userRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
 
         // then
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("new-token")).isTrue();
-        assertThat(preUserRefreshRepository.count()).isEqualTo(1);
+        assertThat(userRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("new-token")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(1);
     }
 
     @Test
@@ -540,18 +540,18 @@ class PreUserRefreshRepositoryTest {
                         .refresh("token-2")
                         .build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
 
         LocalDateTime veryOldTime = LocalDateTime.now().minusDays(30);
 
         // when
-        preUserRefreshRepository.deleteByCreatedDateBefore(veryOldTime);
+        userRefreshRepository.deleteByCreatedDateBefore(veryOldTime);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
-        assertThat(preUserRefreshRepository.existsByRefresh("token-1")).isTrue();
-        assertThat(preUserRefreshRepository.existsByRefresh("token-2")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(2);
+        assertThat(userRefreshRepository.existsByRefresh("token-1")).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh("token-2")).isTrue();
     }
 
     @Test
@@ -570,19 +570,19 @@ class PreUserRefreshRepositoryTest {
                         .refresh("token-2")
                         .build();
 
-        preUserRefreshRepository.save(refresh1);
-        preUserRefreshRepository.save(refresh2);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(refresh1);
+        userRefreshRepository.save(refresh2);
+        userRefreshRepository.flush();
 
         LocalDateTime futureTime = LocalDateTime.now().plusDays(1);
 
         // when
-        preUserRefreshRepository.deleteByCreatedDateBefore(futureTime);
+        userRefreshRepository.deleteByCreatedDateBefore(futureTime);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isZero();
-        assertThat(preUserRefreshRepository.existsByRefresh("token-1")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("token-2")).isFalse();
+        assertThat(userRefreshRepository.count()).isZero();
+        assertThat(userRefreshRepository.existsByRefresh("token-1")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("token-2")).isFalse();
     }
 
     @Test
@@ -605,9 +605,9 @@ class PreUserRefreshRepositoryTest {
                         .refresh("old-token-2")
                         .build();
 
-        preUserRefreshRepository.save(oldRefresh1);
-        preUserRefreshRepository.save(oldRefresh2);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(oldRefresh1);
+        userRefreshRepository.save(oldRefresh2);
+        userRefreshRepository.flush();
 
         updateCreatedDate(oldRefresh1, oldTime);
         updateCreatedDate(oldRefresh2, oldTime);
@@ -624,22 +624,22 @@ class PreUserRefreshRepositoryTest {
                         .refresh("new-token-2")
                         .build();
 
-        preUserRefreshRepository.save(newRefresh1);
-        preUserRefreshRepository.save(newRefresh2);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(newRefresh1);
+        userRefreshRepository.save(newRefresh2);
+        userRefreshRepository.flush();
 
         updateCreatedDate(newRefresh1, newTime);
         updateCreatedDate(newRefresh2, newTime);
 
         // when
-        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+        userRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isEqualTo(2);
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("new-token-1")).isTrue();
-        assertThat(preUserRefreshRepository.existsByRefresh("new-token-2")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(2);
+        assertThat(userRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("new-token-1")).isTrue();
+        assertThat(userRefreshRepository.existsByRefresh("new-token-2")).isTrue();
     }
 
     @Test
@@ -649,8 +649,8 @@ class PreUserRefreshRepositoryTest {
         LocalDateTime anyTime = LocalDateTime.now();
 
         // when & then - 에러 없이 정상 실행되어야 함
-        preUserRefreshRepository.deleteByCreatedDateBefore(anyTime);
-        assertThat(preUserRefreshRepository.count()).isZero();
+        userRefreshRepository.deleteByCreatedDateBefore(anyTime);
+        assertThat(userRefreshRepository.count()).isZero();
     }
 
     @Test
@@ -668,9 +668,9 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity oldToken2 =
                 UserRefreshEntity.builder().username(username).refresh("old-token-2").build();
 
-        preUserRefreshRepository.save(oldToken1);
-        preUserRefreshRepository.save(oldToken2);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(oldToken1);
+        userRefreshRepository.save(oldToken2);
+        userRefreshRepository.flush();
 
         updateCreatedDate(oldToken1, oldTime);
         updateCreatedDate(oldToken2, oldTime);
@@ -678,18 +678,18 @@ class PreUserRefreshRepositoryTest {
         UserRefreshEntity newToken =
                 UserRefreshEntity.builder().username(username).refresh("new-token").build();
 
-        preUserRefreshRepository.save(newToken);
-        preUserRefreshRepository.flush();
+        userRefreshRepository.save(newToken);
+        userRefreshRepository.flush();
 
         updateCreatedDate(newToken, newTime);
 
         // when
-        preUserRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
+        userRefreshRepository.deleteByCreatedDateBefore(cutoffTime);
 
         // then
-        assertThat(preUserRefreshRepository.count()).isEqualTo(1);
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-1")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("old-token-2")).isFalse();
-        assertThat(preUserRefreshRepository.existsByRefresh("new-token")).isTrue();
+        assertThat(userRefreshRepository.count()).isEqualTo(1);
+        assertThat(userRefreshRepository.existsByRefresh("old-token-1")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("old-token-2")).isFalse();
+        assertThat(userRefreshRepository.existsByRefresh("new-token")).isTrue();
     }
 }

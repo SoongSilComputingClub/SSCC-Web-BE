@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.domain.user.entity.UserRefreshEntity;
-import com.example.ssccwebbe.domain.user.repository.PreUserRefreshRepository;
+import com.example.ssccwebbe.domain.user.repository.UserRefreshRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.jwt.code.JwtErrorCode;
 import com.example.ssccwebbe.global.security.jwt.dto.JwtResponseDto;
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PreJwtServiceImpl implements JwtService {
 
-    private final PreUserRefreshRepository preUserRefreshRepository;
+    private final UserRefreshRepository userRefreshRepository;
 
     @Value("${frontend.cookie.secure}")
     private boolean cookieSecure;
@@ -72,8 +72,8 @@ public class PreJwtServiceImpl implements JwtService {
                 UserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
 
         removeRefresh(refreshToken);
-        preUserRefreshRepository.flush(); // 같은 트랜잭션 내부라 : 삭제 -> 생성 문제 해결
-        preUserRefreshRepository.save(newRefreshEntity);
+        userRefreshRepository.flush(); // 같은 트랜잭션 내부라 : 삭제 -> 생성 문제 해결
+        userRefreshRepository.save(newRefreshEntity);
 
         // 기존 쿠키 제거
         Cookie refreshCookie = new Cookie("refreshToken", null);
@@ -116,7 +116,7 @@ public class PreJwtServiceImpl implements JwtService {
                 UserRefreshEntity.builder().username(username).refresh(newRefreshToken).build();
 
         removeRefresh(refreshToken);
-        preUserRefreshRepository.save(newRefreshEntity);
+        userRefreshRepository.save(newRefreshEntity);
 
         return new JwtResponseDto(newAccessToken, newRefreshToken);
     }
@@ -127,24 +127,24 @@ public class PreJwtServiceImpl implements JwtService {
         UserRefreshEntity entity =
                 UserRefreshEntity.builder().username(username).refresh(refreshToken).build();
 
-        preUserRefreshRepository.save(entity);
+        userRefreshRepository.save(entity);
     }
 
     // JWT Refresh 존재 확인 메소드
     @Transactional(readOnly = true)
     public Boolean existsRefresh(String refreshToken) {
-        return preUserRefreshRepository.existsByRefresh(refreshToken);
+        return userRefreshRepository.existsByRefresh(refreshToken);
     }
 
     // JWT Refresh 토큰 삭제 메소드
     @Transactional
     public void removeRefresh(String refreshToken) {
-        preUserRefreshRepository.deleteByRefresh(refreshToken);
+        userRefreshRepository.deleteByRefresh(refreshToken);
     }
 
     // 특정 유저 Refresh 토큰 모두 삭제 (탈퇴)
     @Transactional
     public void removeRefreshUser(String username) {
-        preUserRefreshRepository.deleteByUsername(username);
+        userRefreshRepository.deleteByUsername(username);
     }
 }
