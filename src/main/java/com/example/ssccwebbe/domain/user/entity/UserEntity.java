@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.entity;
+package com.example.ssccwebbe.domain.user.entity;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +16,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import com.example.ssccwebbe.domain.preuser.dto.PreUserRequestDto;
+import com.example.ssccwebbe.domain.user.dto.UserRequestDto;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 import lombok.AllArgsConstructor;
@@ -26,12 +26,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class) // 생성일, 수정일 자동 변경
-@Table(name = "pre_user_entity")
+@Table(name = "user_entity")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreUserEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,7 +81,7 @@ public class PreUserEntity {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    public void updateUser(PreUserRequestDto dto) {
+    public void updateUser(UserRequestDto dto) {
         this.email = dto.getEmail(); // 이메일 수정 허용
         this.nickname = dto.getNickname(); // 닉네임 수정 허용
     }

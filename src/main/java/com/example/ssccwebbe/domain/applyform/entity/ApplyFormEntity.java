@@ -21,7 +21,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.example.ssccwebbe.domain.applyform.dto.ApplyFormCreateOrUpdateRequest;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,8 +35,7 @@ import lombok.NoArgsConstructor;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
         name = "apply_form_entity",
-        uniqueConstraints =
-                @UniqueConstraint(name = "uk_apply_form_preuser", columnNames = "preuser_id"))
+        uniqueConstraints = @UniqueConstraint(name = "uk_apply_form_user", columnNames = "user_id"))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,10 +45,10 @@ public class ApplyFormEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // PreUser 1명당 지원서 1개
+    // User 1명당 지원서 1개
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "preuser_id", nullable = false, updatable = false)
-    private PreUserEntity preUser;
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    private UserEntity user;
 
     @Column(name = "applicant_name", nullable = false)
     private String applicantName;
@@ -97,11 +96,10 @@ public class ApplyFormEntity {
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
 
-    public static ApplyFormEntity create(
-            PreUserEntity preUser, ApplyFormCreateOrUpdateRequest req) {
+    public static ApplyFormEntity create(UserEntity user, ApplyFormCreateOrUpdateRequest req) {
         return new ApplyFormEntity(
                 null,
-                preUser,
+                user,
                 req.applicantName(),
                 req.department(),
                 req.studentNo(),

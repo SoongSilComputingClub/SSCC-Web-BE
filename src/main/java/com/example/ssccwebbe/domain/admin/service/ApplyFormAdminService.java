@@ -91,7 +91,7 @@ public class ApplyFormAdminService {
 
         return new ApplyFormReadResponse(
                 form.getId(),
-                form.getPreUser().getUsername(),
+                form.getUser().getUsername(),
                 form.getApplicantName(),
                 form.getDepartment(),
                 form.getStudentNo(),

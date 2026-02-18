@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ssccwebbe.apitest.dto.TestTokenResponseDto;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.security.UserRoleType;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 import com.example.ssccwebbe.global.security.jwt.util.JwtUtil;
@@ -18,22 +18,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TestService {
 
-    private final PreUserRepository preUserRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
     @Transactional
     public TestTokenResponseDto createOrGetTokens(String username) {
 
         // 1. 유저 조회 (isSocial=false인 유저)
-        Optional<PreUserEntity> existingUser =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+        Optional<UserEntity> existingUser =
+                userRepository.findByUsernameAndIsSocial(username, false);
 
-        PreUserEntity user;
+        UserEntity user;
 
         // 2. 없으면 새로 생성
         if (existingUser.isEmpty()) {
             user =
-                    PreUserEntity.builder()
+                    UserEntity.builder()
                             .username(username)
                             .email(username + "@test.com")
                             .nickname(username)
@@ -44,7 +44,7 @@ public class TestService {
                             .socialProviderType(null)
                             .build();
 
-            preUserRepository.save(user);
+            userRepository.save(user);
         } else {
             user = existingUser.get();
         }

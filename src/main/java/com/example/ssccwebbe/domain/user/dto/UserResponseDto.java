@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.dto;
+package com.example.ssccwebbe.domain.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PreUserResponseDto {
+public class UserResponseDto {
     private String username;
     private Boolean social;
     private String nickname;

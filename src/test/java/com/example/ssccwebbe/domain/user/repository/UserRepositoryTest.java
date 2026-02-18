@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.repository;
+package com.example.ssccwebbe.domain.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,20 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class PreUserRepositoryTest {
+class UserRepositoryTest {
 
-    @Autowired private PreUserRepository preUserRepository;
+    @Autowired private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
-        preUserRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -33,8 +33,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsSocial_SocialUser_Success() {
         // given
         String username = "socialuser@test.com";
-        PreUserEntity socialUser =
-                PreUserEntity.builder()
+        UserEntity socialUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(true)
                         .isLock(false)
@@ -44,11 +44,10 @@ class PreUserRepositoryTest {
                         .nickname("Social User")
                         .email("socialuser@test.com")
                         .build();
-        preUserRepository.save(socialUser);
+        userRepository.save(socialUser);
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, true);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, true);
 
         // then
         assertThat(result).isPresent();
@@ -62,8 +61,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsSocial_RegularUser_Success() {
         // given
         String username = "regularuser@test.com";
-        PreUserEntity regularUser =
-                PreUserEntity.builder()
+        UserEntity regularUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(false)
                         .isLock(false)
@@ -73,11 +72,10 @@ class PreUserRepositoryTest {
                         .nickname("Regular User")
                         .email("regularuser@test.com")
                         .build();
-        preUserRepository.save(regularUser);
+        userRepository.save(regularUser);
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isPresent();
@@ -93,8 +91,8 @@ class PreUserRepositoryTest {
         String nonExistingUsername = "nonexisting@test.com";
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(nonExistingUsername, true);
+        Optional<UserEntity> result =
+                userRepository.findByUsernameAndIsSocial(nonExistingUsername, true);
 
         // then
         assertThat(result).isEmpty();
@@ -104,8 +102,8 @@ class PreUserRepositoryTest {
     @DisplayName("여러 사용자 중에서 username과 isSocial 조건에 맞는 사용자만 조회된다")
     void findByUsernameAndIsSocial_MultipleUsers_ReturnsMatchingUser() {
         // given
-        PreUserEntity socialUser1 =
-                PreUserEntity.builder()
+        UserEntity socialUser1 =
+                UserEntity.builder()
                         .username("social1@test.com")
                         .isSocial(true)
                         .isLock(false)
@@ -116,8 +114,8 @@ class PreUserRepositoryTest {
                         .email("social1@test.com")
                         .build();
 
-        PreUserEntity regularUser1 =
-                PreUserEntity.builder()
+        UserEntity regularUser1 =
+                UserEntity.builder()
                         .username("regular1@test.com")
                         .isSocial(false)
                         .isLock(false)
@@ -128,8 +126,8 @@ class PreUserRepositoryTest {
                         .email("regular1@test.com")
                         .build();
 
-        PreUserEntity regularUser2 =
-                PreUserEntity.builder()
+        UserEntity regularUser2 =
+                UserEntity.builder()
                         .username("regular2@test.com")
                         .isSocial(false)
                         .isLock(false)
@@ -140,13 +138,13 @@ class PreUserRepositoryTest {
                         .email("regular2@test.com")
                         .build();
 
-        preUserRepository.save(socialUser1);
-        preUserRepository.save(regularUser1);
-        preUserRepository.save(regularUser2);
+        userRepository.save(socialUser1);
+        userRepository.save(regularUser1);
+        userRepository.save(regularUser2);
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial("regular1@test.com", false);
+        Optional<UserEntity> result =
+                userRepository.findByUsernameAndIsSocial("regular1@test.com", false);
 
         // then
         assertThat(result).isPresent();
@@ -160,8 +158,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsSocial_WrongSocialFlag_ReturnsEmpty() {
         // given
         String username = "user@test.com";
-        PreUserEntity socialUser =
-                PreUserEntity.builder()
+        UserEntity socialUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(true)
                         .isLock(false)
@@ -171,11 +169,10 @@ class PreUserRepositoryTest {
                         .nickname("User")
                         .email("user@test.com")
                         .build();
-        preUserRepository.save(socialUser);
+        userRepository.save(socialUser);
 
         // when - isSocial이 false로 조회
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsSocial(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsSocial(username, false);
 
         // then
         assertThat(result).isEmpty();
@@ -186,8 +183,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsLock_LockedUser_Success() {
         // given
         String username = "lockeduser@test.com";
-        PreUserEntity lockedUser =
-                PreUserEntity.builder()
+        UserEntity lockedUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(false)
                         .isLock(true)
@@ -197,10 +194,10 @@ class PreUserRepositoryTest {
                         .nickname("Locked User")
                         .email("lockeduser@test.com")
                         .build();
-        preUserRepository.save(lockedUser);
+        userRepository.save(lockedUser);
 
         // when
-        Optional<PreUserEntity> result = preUserRepository.findByUsernameAndIsLock(username, true);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, true);
 
         // then
         assertThat(result).isPresent();
@@ -213,8 +210,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsLock_UnlockedUser_Success() {
         // given
         String username = "normaluser@test.com";
-        PreUserEntity normalUser =
-                PreUserEntity.builder()
+        UserEntity normalUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(false)
                         .isLock(false)
@@ -224,10 +221,10 @@ class PreUserRepositoryTest {
                         .nickname("Normal User")
                         .email("normaluser@test.com")
                         .build();
-        preUserRepository.save(normalUser);
+        userRepository.save(normalUser);
 
         // when
-        Optional<PreUserEntity> result = preUserRepository.findByUsernameAndIsLock(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, false);
 
         // then
         assertThat(result).isPresent();
@@ -242,8 +239,8 @@ class PreUserRepositoryTest {
         String nonExistingUsername = "notfound@test.com";
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsLock(nonExistingUsername, false);
+        Optional<UserEntity> result =
+                userRepository.findByUsernameAndIsLock(nonExistingUsername, false);
 
         // then
         assertThat(result).isEmpty();
@@ -253,8 +250,8 @@ class PreUserRepositoryTest {
     @DisplayName("여러 사용자 중에서 username과 isLock 조건에 맞는 사용자만 조회된다")
     void findByUsernameAndIsLock_MultipleUsers_ReturnsMatchingUser() {
         // given
-        PreUserEntity lockedUser =
-                PreUserEntity.builder()
+        UserEntity lockedUser =
+                UserEntity.builder()
                         .username("locked1@test.com")
                         .isSocial(false)
                         .isLock(true)
@@ -265,8 +262,8 @@ class PreUserRepositoryTest {
                         .email("locked1@test.com")
                         .build();
 
-        PreUserEntity normalUser1 =
-                PreUserEntity.builder()
+        UserEntity normalUser1 =
+                UserEntity.builder()
                         .username("normal1@test.com")
                         .isSocial(false)
                         .isLock(false)
@@ -277,8 +274,8 @@ class PreUserRepositoryTest {
                         .email("normal1@test.com")
                         .build();
 
-        PreUserEntity normalUser2 =
-                PreUserEntity.builder()
+        UserEntity normalUser2 =
+                UserEntity.builder()
                         .username("normal2@test.com")
                         .isSocial(false)
                         .isLock(false)
@@ -289,13 +286,13 @@ class PreUserRepositoryTest {
                         .email("normal2@test.com")
                         .build();
 
-        preUserRepository.save(lockedUser);
-        preUserRepository.save(normalUser1);
-        preUserRepository.save(normalUser2);
+        userRepository.save(lockedUser);
+        userRepository.save(normalUser1);
+        userRepository.save(normalUser2);
 
         // when
-        Optional<PreUserEntity> result =
-                preUserRepository.findByUsernameAndIsLock("normal1@test.com", false);
+        Optional<UserEntity> result =
+                userRepository.findByUsernameAndIsLock("normal1@test.com", false);
 
         // then
         assertThat(result).isPresent();
@@ -309,8 +306,8 @@ class PreUserRepositoryTest {
     void findByUsernameAndIsLock_WrongLockFlag_ReturnsEmpty() {
         // given
         String username = "testuser@test.com";
-        PreUserEntity lockedUser =
-                PreUserEntity.builder()
+        UserEntity lockedUser =
+                UserEntity.builder()
                         .username(username)
                         .isSocial(false)
                         .isLock(true)
@@ -320,10 +317,10 @@ class PreUserRepositoryTest {
                         .nickname("Test User")
                         .email("testuser@test.com")
                         .build();
-        preUserRepository.save(lockedUser);
+        userRepository.save(lockedUser);
 
         // when - isLock이 false로 조회
-        Optional<PreUserEntity> result = preUserRepository.findByUsernameAndIsLock(username, false);
+        Optional<UserEntity> result = userRepository.findByUsernameAndIsLock(username, false);
 
         // then
         assertThat(result).isEmpty();

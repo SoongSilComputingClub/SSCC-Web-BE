@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.entity;
+package com.example.ssccwebbe.domain.user.entity;
 
 import java.time.LocalDateTime;
 
@@ -20,12 +20,12 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "pre_user_refresh_entity")
+@Table(name = "user_refresh_entity")
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PreUserRefreshEntity {
+public class UserRefreshEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

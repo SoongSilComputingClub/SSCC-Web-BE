@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.dto;
+package com.example.ssccwebbe.domain.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PreUserRequestDto {
+public class UserRequestDto {
     public interface ExistGroup {} // 회원 가입시 username 존재 확인
 
     public interface AddGroup {} // 회원 가입시

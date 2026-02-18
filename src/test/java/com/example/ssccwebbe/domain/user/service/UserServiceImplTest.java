@@ -1,4 +1,4 @@
-package com.example.ssccwebbe.domain.preuser.service;
+package com.example.ssccwebbe.domain.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
@@ -17,35 +17,35 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.example.ssccwebbe.domain.preuser.code.PreUserErrorCode;
-import com.example.ssccwebbe.domain.preuser.dto.PreUserResponseDto;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.entity.SocialProviderType;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.code.UserErrorCode;
+import com.example.ssccwebbe.domain.user.dto.UserResponseDto;
+import com.example.ssccwebbe.domain.user.entity.SocialProviderType;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 import com.example.ssccwebbe.global.security.UserRoleType;
 
 @ExtendWith(MockitoExtension.class)
-class PreUserServiceImplTest {
+class UserServiceImplTest {
 
-    @Mock private PreUserRepository preUserRepository;
+    @Mock private UserRepository userRepository;
 
     @Mock private SecurityContext securityContext;
 
     @Mock private Authentication authentication;
 
-    @InjectMocks private PreUserServiceImpl preUserService;
+    @InjectMocks private UserServiceImpl userService;
 
     @Test
-    @DisplayName("readPreUser - 일반 사용자 정보를 정상적으로 조회한다")
-    void readPreUser_RegularUser_Success() {
+    @DisplayName("readUser - 일반 사용자 정보를 정상적으로 조회한다")
+    void readUser_RegularUser_Success() {
         // given
         String username = "testuser@test.com";
         String email = "testuser@test.com";
         String nickname = "Test User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -59,11 +59,11 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -72,19 +72,19 @@ class PreUserServiceImplTest {
         assertThat(result.getNickname()).isEqualTo(nickname);
         assertThat(result.getSocial()).isFalse();
 
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - 소셜 로그인 사용자 정보를 정상적으로 조회한다")
-    void readPreUser_SocialUser_Success() {
+    @DisplayName("readUser - 소셜 로그인 사용자 정보를 정상적으로 조회한다")
+    void readUser_SocialUser_Success() {
         // given
         String username = "GOOGLE_123456789";
         String email = "socialuser@gmail.com";
         String nickname = "Social User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -99,11 +99,11 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -112,12 +112,12 @@ class PreUserServiceImplTest {
         assertThat(result.getNickname()).isEqualTo(nickname);
         assertThat(result.getSocial()).isTrue();
 
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
-    void readPreUser_UserNotFound_ThrowsException() {
+    @DisplayName("readUser - 존재하지 않는 사용자 조회 시 GeneralException 발생")
+    void readUser_UserNotFound_ThrowsException() {
         // given
         String username = "nonexistent@test.com";
 
@@ -126,21 +126,20 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
 
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readPreUser());
+                        GeneralException.class, () -> userService.readUser());
 
-        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - 계정이 잠긴 사용자는 조회되지 않는다")
-    void readPreUser_LockedUser_NotFound() {
+    @DisplayName("readUser - 계정이 잠긴 사용자는 조회되지 않는다")
+    void readUser_LockedUser_NotFound() {
         // given
         String username = "lockeduser@test.com";
 
@@ -150,28 +149,27 @@ class PreUserServiceImplTest {
         SecurityContextHolder.setContext(securityContext);
 
         // isLock=true인 사용자는 조회되지 않음
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsernameAndIsLock(username, false)).thenReturn(Optional.empty());
 
         // when & then
         GeneralException exception =
                 org.junit.jupiter.api.Assertions.assertThrows(
-                        GeneralException.class, () -> preUserService.readPreUser());
+                        GeneralException.class, () -> userService.readUser());
 
-        assertThat(exception.getErrorCode()).isEqualTo(PreUserErrorCode.USER_NOT_FOUND);
-        verify(preUserRepository, times(1)).findByUsernameAndIsLock(username, false);
+        assertThat(exception.getErrorCode()).isEqualTo(UserErrorCode.USER_NOT_FOUND);
+        verify(userRepository, times(1)).findByUsernameAndIsLock(username, false);
     }
 
     @Test
-    @DisplayName("readPreUser - PREUSER 권한 사용자도 정상적으로 조회된다")
-    void readPreUser_PreUserRole_Success() {
+    @DisplayName("readUser - PREUSER 권한 사용자도 정상적으로 조회된다")
+    void readUser_UserRole_Success() {
         // given
         String username = "preuser@test.com";
         String email = "preuser@test.com";
         String nickname = "Pre User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -185,11 +183,11 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();
@@ -200,15 +198,15 @@ class PreUserServiceImplTest {
     }
 
     @Test
-    @DisplayName("readPreUser - ADMIN 권한 사용자도 정상적으로 조회된다")
-    void readPreUser_AdminRole_Success() {
+    @DisplayName("readUser - ADMIN 권한 사용자도 정상적으로 조회된다")
+    void readUser_AdminRole_Success() {
         // given
         String username = "admin@test.com";
         String email = "admin@test.com";
         String nickname = "Admin User";
 
-        PreUserEntity userEntity =
-                PreUserEntity.builder()
+        UserEntity userEntity =
+                UserEntity.builder()
                         .username(username)
                         .email(email)
                         .nickname(nickname)
@@ -222,11 +220,11 @@ class PreUserServiceImplTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        when(preUserRepository.findByUsernameAndIsLock(username, false))
+        when(userRepository.findByUsernameAndIsLock(username, false))
                 .thenReturn(Optional.of(userEntity));
 
         // when
-        PreUserResponseDto result = preUserService.readPreUser();
+        UserResponseDto result = userService.readUser();
 
         // then
         assertThat(result).isNotNull();

@@ -20,7 +20,7 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
 
 @ExtendWith(MockitoExtension.class)
 class ApplyFormAdminServiceTest {
@@ -91,10 +91,10 @@ class ApplyFormAdminServiceTest {
     @DisplayName("getAllApplications - 전체 지원서 리스트 조회 성공")
     void getAllApplications_Success() {
         // given
-        PreUserEntity preUser = PreUserEntity.builder().username("user1").build();
+        UserEntity user = UserEntity.builder().username("user1").build();
         ApplyFormEntity form = mock(ApplyFormEntity.class);
         when(form.getId()).thenReturn(1L);
-        when(form.getPreUser()).thenReturn(preUser);
+        when(form.getUser()).thenReturn(user);
         when(form.getApplicantName()).thenReturn("홍길동");
         when(form.getGender()).thenReturn("남");
         when(form.getStatus()).thenReturn(ApplyFormStatus.SUBMITTED);

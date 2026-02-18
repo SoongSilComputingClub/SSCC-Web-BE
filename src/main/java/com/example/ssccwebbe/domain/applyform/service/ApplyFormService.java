@@ -14,8 +14,8 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
-import com.example.ssccwebbe.domain.preuser.entity.PreUserEntity;
-import com.example.ssccwebbe.domain.preuser.repository.PreUserRepository;
+import com.example.ssccwebbe.domain.user.entity.UserEntity;
+import com.example.ssccwebbe.domain.user.repository.UserRepository;
 import com.example.ssccwebbe.global.apipayload.exception.GeneralException;
 
 import lombok.RequiredArgsConstructor;
@@ -26,22 +26,22 @@ public class ApplyFormService {
 
     private final ApplyFormRepository applyFormRepository;
     private final ApplyFormInterviewTimeRepository interviewTimeRepository;
-    private final PreUserRepository preUserRepository;
+    private final UserRepository userRepository;
 
     // 지원서 조회용
     @Transactional(readOnly = true)
     public ApplyFormReadResponse read() {
-        PreUserEntity preUser = currentPreUser();
+        UserEntity user = currentUser();
         ApplyFormEntity form =
                 applyFormRepository
-                        .findByPreUser(preUser)
+                        .findByUser(user)
                         .orElseThrow(
                                 () ->
                                         new GeneralException(
                                                 ApplyFormErrorCode.APPLY_FORM_NOT_FOUND));
 
         requireActive(form);
-        return toResponse(preUser, form);
+        return toResponse(user, form);
     }
 
     // 지원서 처음 생성 시
@@ -49,10 +49,10 @@ public class ApplyFormService {
     public ApplyFormReadResponse create(ApplyFormCreateOrUpdateRequest req) {
         validate(req);
 
-        PreUserEntity preUser = currentPreUser();
+        UserEntity user = currentUser();
 
         return applyFormRepository
-                .findByPreUser(preUser)
+                .findByUser(user)
                 .map(
                         existing -> {
                             // 이미 활성 지원서가 있으면 생성 불가
@@ -66,15 +66,15 @@ public class ApplyFormService {
                             existing.update(req);
                             overwriteInterviewTimes(existing, req);
 
-                            return toResponse(preUser, existing);
+                            return toResponse(user, existing);
                         })
                 .orElseGet(
                         () -> {
                             // 지원서 자체가 없으면 신규 생성
                             ApplyFormEntity saved =
-                                    applyFormRepository.save(ApplyFormEntity.create(preUser, req));
+                                    applyFormRepository.save(ApplyFormEntity.create(user, req));
                             overwriteInterviewTimes(saved, req);
-                            return toResponse(preUser, saved);
+                            return toResponse(user, saved);
                         });
     }
 
@@ -83,10 +83,10 @@ public class ApplyFormService {
     public ApplyFormReadResponse update(ApplyFormCreateOrUpdateRequest req) {
         validate(req);
 
-        PreUserEntity preUser = currentPreUser();
+        UserEntity user = currentUser();
         ApplyFormEntity form =
                 applyFormRepository
-                        .findByPreUser(preUser)
+                        .findByUser(user)
                         .orElseThrow(
                                 () ->
                                         new GeneralException(
@@ -97,16 +97,16 @@ public class ApplyFormService {
         form.update(req);
         overwriteInterviewTimes(form, req);
 
-        return toResponse(preUser, form);
+        return toResponse(user, form);
     }
 
     // 지원서 삭제
     @Transactional
     public void deleteSoft() {
-        PreUserEntity preUser = currentPreUser();
+        UserEntity user = currentUser();
         ApplyFormEntity form =
                 applyFormRepository
-                        .findByPreUser(preUser)
+                        .findByUser(user)
                         .orElseThrow(
                                 () ->
                                         new GeneralException(
@@ -121,11 +121,11 @@ public class ApplyFormService {
 
     // ------------------ private ------------------
 
-    // 현재 로그인한 사용자를 pre_user_entity에서 조회
-    private PreUserEntity currentPreUser() {
+    // 현재 로그인한 사용자를 user_entity에서 조회
+    private UserEntity currentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        return preUserRepository
+        return userRepository
                 .findByUsernameAndIsLock(username, false)
                 .orElseThrow(() -> new GeneralException(ApplyFormErrorCode.USER_NOT_FOUND));
     }
@@ -155,7 +155,7 @@ public class ApplyFormService {
         interviewTimeRepository.saveAll(entities);
     }
 
-    private ApplyFormReadResponse toResponse(PreUserEntity preUser, ApplyFormEntity form) {
+    private ApplyFormReadResponse toResponse(UserEntity user, ApplyFormEntity form) {
         List<ApplyFormReadResponse.InterviewTime> times =
                 interviewTimeRepository
                         .findAllByApplyFormOrderByInterviewDateAscStartTimeAsc(form)
@@ -170,7 +170,7 @@ public class ApplyFormService {
 
         return new ApplyFormReadResponse(
                 form.getId(),
-                preUser.getUsername(),
+                user.getUsername(),
                 form.getApplicantName(),
                 form.getDepartment(),
                 form.getStudentNo(),
