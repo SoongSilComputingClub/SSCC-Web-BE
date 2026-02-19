@@ -27,10 +27,10 @@ public class ApplyFormAdminService {
 
     public GenderDistributionResponse getGenderDistribution() {
         long maleCount =
-                applyFormRepository.countByGenderAndStatusNot(Gender.male, ApplyFormStatus.DELETED);
+                applyFormRepository.countByGenderAndStatusNot(Gender.MALE, ApplyFormStatus.DELETED);
         long femaleCount =
                 applyFormRepository.countByGenderAndStatusNot(
-                        Gender.female, ApplyFormStatus.DELETED);
+                        Gender.FEMALE, ApplyFormStatus.DELETED);
         long totalCount = applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED);
 
         double malePercentage = totalCount == 0 ? 0 : (double) maleCount / totalCount * 100;

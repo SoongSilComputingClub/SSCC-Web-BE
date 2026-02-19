@@ -35,9 +35,9 @@ class ApplyFormAdminServiceTest {
     @DisplayName("getGenderDistribution - 성별 분포 조회 성공")
     void getGenderDistribution_Success() {
         // given
-        when(applyFormRepository.countByGenderAndStatusNot(Gender.male, ApplyFormStatus.DELETED))
+        when(applyFormRepository.countByGenderAndStatusNot(Gender.MALE, ApplyFormStatus.DELETED))
                 .thenReturn(3L);
-        when(applyFormRepository.countByGenderAndStatusNot(Gender.female, ApplyFormStatus.DELETED))
+        when(applyFormRepository.countByGenderAndStatusNot(Gender.FEMALE, ApplyFormStatus.DELETED))
                 .thenReturn(1L);
         when(applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED)).thenReturn(4L);
 
@@ -97,7 +97,7 @@ class ApplyFormAdminServiceTest {
         when(form.getId()).thenReturn(1L);
         when(form.getUser()).thenReturn(user);
         when(form.getApplicantName()).thenReturn("홍길동");
-        when(form.getGender()).thenReturn(Gender.male);
+        when(form.getGender()).thenReturn(Gender.MALE);
         when(form.getStatus()).thenReturn(ApplyFormStatus.SUBMITTED);
         when(form.getCodingExp()).thenReturn(CodingExp.C);
 
