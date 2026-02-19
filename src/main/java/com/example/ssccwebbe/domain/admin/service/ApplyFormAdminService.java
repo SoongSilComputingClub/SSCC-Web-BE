@@ -11,6 +11,7 @@ import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.entity.Gender;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 
@@ -26,9 +27,10 @@ public class ApplyFormAdminService {
 
     public GenderDistributionResponse getGenderDistribution() {
         long maleCount =
-                applyFormRepository.countByGenderAndStatusNot("남", ApplyFormStatus.DELETED);
+                applyFormRepository.countByGenderAndStatusNot(Gender.male, ApplyFormStatus.DELETED);
         long femaleCount =
-                applyFormRepository.countByGenderAndStatusNot("여", ApplyFormStatus.DELETED);
+                applyFormRepository.countByGenderAndStatusNot(
+                        Gender.female, ApplyFormStatus.DELETED);
         long totalCount = applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED);
 
         double malePercentage = totalCount == 0 ? 0 : (double) maleCount / totalCount * 100;

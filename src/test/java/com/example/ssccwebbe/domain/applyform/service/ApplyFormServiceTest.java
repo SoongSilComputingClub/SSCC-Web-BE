@@ -28,6 +28,7 @@ import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormInterviewTimeEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.entity.Gender;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
@@ -60,7 +61,7 @@ class ApplyFormServiceTest {
                         "20211234",
                         3,
                         "010-1234-5678",
-                        "MALE",
+                        Gender.male,
                         "자기소개",
                         CodingExp.C,
                         "Java, Spring",
@@ -180,7 +181,7 @@ class ApplyFormServiceTest {
                         "20211234",
                         3,
                         "010-0000-0000",
-                        "FEMALE",
+                        Gender.female,
                         "수정소개",
                         CodingExp.D,
                         "stack",
@@ -223,7 +224,7 @@ class ApplyFormServiceTest {
                         "학번",
                         1,
                         "010",
-                        "G",
+                        Gender.male,
                         "I",
                         CodingExp.A,
                         "S",

@@ -65,8 +65,9 @@ public class ApplyFormEntity {
     @Column(nullable = false)
     private String phone;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(nullable = false, length = 2000)
     private String introduce;

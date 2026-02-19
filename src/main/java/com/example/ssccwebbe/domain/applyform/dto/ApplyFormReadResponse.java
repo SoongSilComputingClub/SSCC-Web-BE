@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.entity.Gender;
 
 // 지원서 조회 응답을 위한 DTO
 public record ApplyFormReadResponse(
@@ -16,7 +17,7 @@ public record ApplyFormReadResponse(
         String studentNo,
         Integer grade,
         String phone,
-        String gender,
+        Gender gender,
         String introduce,
         CodingExp codingExp,
         String techStackText,
