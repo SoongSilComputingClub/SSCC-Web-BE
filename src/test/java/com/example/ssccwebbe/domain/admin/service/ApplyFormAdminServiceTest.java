@@ -18,6 +18,7 @@ import com.example.ssccwebbe.domain.applyform.dto.ApplyFormReadResponse;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormEntity;
 import com.example.ssccwebbe.domain.applyform.entity.ApplyFormStatus;
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.entity.Gender;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormInterviewTimeRepository;
 import com.example.ssccwebbe.domain.applyform.repository.ApplyFormRepository;
 import com.example.ssccwebbe.domain.user.entity.UserEntity;
@@ -34,9 +35,9 @@ class ApplyFormAdminServiceTest {
     @DisplayName("getGenderDistribution - 성별 분포 조회 성공")
     void getGenderDistribution_Success() {
         // given
-        when(applyFormRepository.countByGenderAndStatusNot("남", ApplyFormStatus.DELETED))
+        when(applyFormRepository.countByGenderAndStatusNot(Gender.MALE, ApplyFormStatus.DELETED))
                 .thenReturn(3L);
-        when(applyFormRepository.countByGenderAndStatusNot("여", ApplyFormStatus.DELETED))
+        when(applyFormRepository.countByGenderAndStatusNot(Gender.FEMALE, ApplyFormStatus.DELETED))
                 .thenReturn(1L);
         when(applyFormRepository.countByStatusNot(ApplyFormStatus.DELETED)).thenReturn(4L);
 
@@ -96,7 +97,7 @@ class ApplyFormAdminServiceTest {
         when(form.getId()).thenReturn(1L);
         when(form.getUser()).thenReturn(user);
         when(form.getApplicantName()).thenReturn("홍길동");
-        when(form.getGender()).thenReturn("남");
+        when(form.getGender()).thenReturn(Gender.MALE);
         when(form.getStatus()).thenReturn(ApplyFormStatus.SUBMITTED);
         when(form.getCodingExp()).thenReturn(CodingExp.C);
 

@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import com.example.ssccwebbe.domain.applyform.entity.CodingExp;
+import com.example.ssccwebbe.domain.applyform.entity.Gender;
 
 // 지원서 생성/수정 요청 DTO.
 // 면접 희망 시간은 N개 선택 가능하므로 List로 받음
@@ -18,7 +19,7 @@ public record ApplyFormCreateOrUpdateRequest(
         @NotBlank String studentNo,
         @NotNull Integer grade,
         @NotBlank String phone,
-        @NotBlank String gender,
+        @NotNull Gender gender,
         @NotBlank String introduce,
         @NotNull CodingExp codingExp,
         String techStackText,
