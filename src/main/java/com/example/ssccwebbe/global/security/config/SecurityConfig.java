@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -122,18 +121,6 @@ public class SecurityConfig {
                                 .permitAll() // Swagger UI : 전체 허용
                                 .requestMatchers("/jwt/exchange", "/jwt/refresh")
                                 .permitAll() // JWT 발급 경로 : 전체 허용
-                                .requestMatchers("/test/preuser-only")
-                                .hasRole(UserRoleType.PREUSER.name()) // PREUSER 권한 테스트
-                                .requestMatchers("/test")
-                                .permitAll() // 테스트용 토큰 발급 경로 : 전체 허용
-                                .requestMatchers(HttpMethod.POST, "/user/exist", "/user")
-                                .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/user")
-                                .hasRole(UserRoleType.PREUSER.name())
-                                .requestMatchers(HttpMethod.PUT, "/user")
-                                .hasRole(UserRoleType.PREUSER.name())
-                                .requestMatchers(HttpMethod.DELETE, "/user")
-                                .hasRole(UserRoleType.PREUSER.name())
                                 .requestMatchers("/admin/**")
                                 .hasRole(UserRoleType.ADMIN.name())
                                 .anyRequest()
