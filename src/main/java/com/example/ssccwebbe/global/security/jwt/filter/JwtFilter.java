@@ -61,7 +61,10 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = JwtUtil.getUsername(accessToken);
             String role = JwtUtil.getRole(accessToken);
 
-            log.debug("[JwtFilter] Authentication successful - Username: {}, Role: {}", username, role);
+            log.debug(
+                    "[JwtFilter] Authentication successful - Username: {}, Role: {}",
+                    username,
+                    role);
 
             List<GrantedAuthority> authorities =
                     Collections.singletonList(new SimpleGrantedAuthority(role));
