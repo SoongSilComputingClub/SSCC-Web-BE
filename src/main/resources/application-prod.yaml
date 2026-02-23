@@ -29,6 +29,12 @@ spring:
               - profile
               - email
 
+springdoc:
+  api-docs:
+    enabled: false # /v3/api-docs API
+  swagger-ui:
+    enabled: false # /swagger-ui.html
+
 # JWT Configuration (production uses environment variables)
 jwt:
   secret-key: ${PROD_JWT_SECRET_KEY}
