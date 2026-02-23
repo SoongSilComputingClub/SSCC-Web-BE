@@ -2,6 +2,8 @@ package com.example.ssccwebbe.global.security.config;
 
 import java.util.List;
 
+import jakarta.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +30,9 @@ import com.example.ssccwebbe.global.security.handler.RefreshTokenLogoutHandler;
 import com.example.ssccwebbe.global.security.jwt.filter.JwtFilter;
 import com.example.ssccwebbe.global.security.jwt.service.JwtService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Configuration
 @EnableWebSecurity // 시큐리티 빈 설정 활성화
 public class SecurityConfig {
@@ -41,6 +46,18 @@ public class SecurityConfig {
 
     @Value("${frontend.url}")
     private String frontendUrl;
+
+    @Value("${springdoc.swagger-ui.enabled:true}")
+    private boolean swaggerEnabled;
+
+    @Value("${spring.profiles.active:default}")
+    private String activeProfile;
+
+    @PostConstruct
+    public void checkConfig() {
+        log.info("Active profile: {}", activeProfile);
+        log.info("Swagger UI enabled: {}", swaggerEnabled);
+    }
 
     // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
     public SecurityConfig(
@@ -115,16 +132,19 @@ public class SecurityConfig {
 
         // 인가
         http.authorizeHttpRequests(
-                auth ->
+                auth -> {
+                    if (swaggerEnabled) {
                         auth.requestMatchers(
                                         "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
-                                .permitAll() // Swagger UI : 전체 허용
-                                .requestMatchers("/jwt/exchange", "/jwt/refresh")
-                                .permitAll() // JWT 발급 경로 : 전체 허용
-                                .requestMatchers("/admin/**")
-                                .hasRole(UserRoleType.ADMIN.name())
-                                .anyRequest()
-                                .authenticated());
+                                .permitAll(); // Swagger UI : 비 prod 환경에서만 허용
+                    }
+                    auth.requestMatchers("/jwt/exchange", "/jwt/refresh")
+                            .permitAll() // JWT 발급 경로 : 전체 허용
+                            .requestMatchers("/admin/**")
+                            .hasRole(UserRoleType.ADMIN.name())
+                            .anyRequest()
+                            .authenticated();
+                });
 
         // 예외 처리
         http.exceptionHandling(
