@@ -55,8 +55,8 @@ public class SecurityConfig {
 
     @PostConstruct
     public void checkConfig() {
-        log.info("현재 활성화된 프로필: {}", activeProfile);
-        log.info("Swagger UI 활성화 여부: {}", swaggerEnabled);
+        log.info("Active profile: {}", activeProfile);
+        log.info("Swagger UI enabled: {}", swaggerEnabled);
     }
 
     // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
