@@ -42,6 +42,9 @@ public class SecurityConfig {
     @Value("${frontend.url}")
     private String frontendUrl;
 
+    @Value("${springdoc.swagger-ui.enabled:true}")
+    private boolean swaggerEnabled;
+
     // LoginSuccessHandler 빈을 명확히 주입 받기 위해 Qualifier 설정 도입
     public SecurityConfig(
             @Qualifier("SocialSuccessHandler") AuthenticationSuccessHandler socialSuccessHandler,
@@ -115,16 +118,19 @@ public class SecurityConfig {
 
         // 인가
         http.authorizeHttpRequests(
-                auth ->
+                auth -> {
+                    if (swaggerEnabled) {
                         auth.requestMatchers(
                                         "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html")
-                                .permitAll() // Swagger UI : 전체 허용
-                                .requestMatchers("/jwt/exchange", "/jwt/refresh")
-                                .permitAll() // JWT 발급 경로 : 전체 허용
-                                .requestMatchers("/admin/**")
-                                .hasRole(UserRoleType.ADMIN.name())
-                                .anyRequest()
-                                .authenticated());
+                                .permitAll(); // Swagger UI : 비 prod 환경에서만 허용
+                    }
+                    auth.requestMatchers("/jwt/exchange", "/jwt/refresh")
+                            .permitAll() // JWT 발급 경로 : 전체 허용
+                            .requestMatchers("/admin/**")
+                            .hasRole(UserRoleType.ADMIN.name())
+                            .anyRequest()
+                            .authenticated();
+                });
 
         // 예외 처리
         http.exceptionHandling(
